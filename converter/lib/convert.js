@@ -59,7 +59,6 @@
 
        const filename = path.basename(file.path.replace(/\.\w+$/, '.mkv'))
        const output = path.join(transcoding_path, container.id, filename)
-       const encodingLog = fs.createWriteStream(`${output}.encoding.log`)
 
        debug('convert', filename, '->', output)
 
@@ -68,6 +67,7 @@
        if(video.length === 0) return next(null) // can't just process audio rn.
 
        mkdirp.sync(path.dirname(output))
+       const encodingLog = fs.createWriteStream(`${output}.encoding.log`)
 
        let convObject = {
          input: file.path,
@@ -90,9 +90,7 @@
 
        let progress, eta, endCatch, completed;
        conv.spawn(convObject)
-        .on('error', err => {
-          debug(err)
-        })
+        // on progress event
         .on('progress', prog => {
           if(isDead) {
             clearTimeout(isDead)
@@ -102,9 +100,13 @@
           progress = prog.percentComplete
           eta      = prog.eta
         })
+
+        // on recognized handbrake error
         .on('error', err => {
           return next(err)
         })
+
+        // Fire when successfully converted
         .on('complete', () => {
           debug('hb-complete')
 
@@ -113,9 +115,13 @@
 
           return next()
         })
+
+        // fired on handbrake output
         .on('output', output => {
           encodingLog.write(output.toString())
         })
+
+        // fired when the process ends.
         .on('end', () => {
           // Catch complete not triggering (error-d)
           endCatch = setTimeout(() => {
