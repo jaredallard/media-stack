@@ -59,6 +59,7 @@
 
        const filename = path.basename(file.path.replace(/\.\w+$/, '.mkv'))
        const output = path.join(transcoding_path, container.id, filename)
+       const encodingLog = fs.createWriteStream(`${output}.encoding.log`)
 
        debug('convert', filename, '->', output)
 
@@ -87,7 +88,7 @@
          debug('progress', container.id, filename, progress, eta)
        }, 10000)
 
-       let progress, eta;
+       let progress, eta, endCatch, completed;
        conv.spawn(convObject)
         .on('error', err => {
           debug(err)
@@ -101,11 +102,34 @@
           progress = prog.percentComplete
           eta      = prog.eta
         })
-        .on('end', () => {
-          clearInterval(progressReporter)
+        .on('error', err => {
+          return next(err)
+        })
+        .on('complete', () => {
+          debug('hb-complete')
+
+          // clear the end-but not complete catcher.
+          clearInterval(endCatch)
+
           return next()
         })
+        .on('output', output => {
+          encodingLog.write(output.toString())
+        })
+        .on('end', () => {
+          // Catch complete not triggering (error-d)
+          endCatch = setTimeout(() => {
+            if(!completed) return next('Failed to convert. See log.')
+          }, 5000)
+
+          encodingLog.write('HB_END')
+          encodingLog.end()
+
+          debug('end', 'fired')
+          clearInterval(progressReporter)
+        })
      }, err => {
+       debug('encoding-err', err)
        if(err) return status(queue, 'error', container.id)
 
        status(queue, 'complete', container.id)

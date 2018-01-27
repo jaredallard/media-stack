@@ -15,6 +15,7 @@ const path       = require('path')
 const fs         = require('fs-extra')
 const mkdirp     = require('mkdirp')
 const async      = require('async')
+const url        = require('url')
 
 const client     = new Webtorrent()
 
@@ -56,9 +57,15 @@ const methods = {
         debug('hash', hash)
         debug('files', torrent.files.length)
 
+        // TODO: check if the download has stalled
+        const downloadProgress = setInterval(() => {
+          debug('download-progress', torrent.progress)
+        }, 1000)
+
         async.eachLimit(torrent.files, 5,
           async file => torrentProcessor(file, id, downloadPath),
         err => { // I love that I can do this in a few lines.
+          clearInterval(downloadProgress)
           if(err) return reject(err)
           return resolv()
         })
@@ -69,13 +76,31 @@ const methods = {
   /**
    * Download via HTTP.
    *
-   * @param  {String} url  resource url
-   * @param  {String} id   File ID
-   * @param  {String} path to save files in
-   * @return {Promise}    .then/.catch etc
+   * @param  {String} resourceUrl   resource url
+   * @param  {String} id            File ID
+   * @param  {String} downloadPath  Path to download file too
+   * @param  {String} path          to save files in
+   * @return {Promise}              .then/.catch etc
    */
-  http: async (url, id) => {
-    debug('http', url)
+  http: async (resourceUrl, id, downloadPath) => {
+    debug('http', resourceUrl)
+
+    return new Promise(async (resolv, reject) => {
+      const parsed   = url.parse(resourceUrl);
+      const filename = path.basename(parsed.pathname)
+      const output   = path.join(downloadPath, filename)
+
+      await mkdirp(downloadPath)
+
+      debug('download', filename, output)
+      const write    = fs.createWriteStream(output)
+      request(resourceUrl).pipe(write)
+
+      // assume it's downloadProgress
+      write.on('close', () => {
+        return resolv()
+      })
+    })
   }
 }
 

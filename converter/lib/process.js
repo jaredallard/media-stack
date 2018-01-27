@@ -21,6 +21,18 @@ const mediaExts = [
   '.webm'
 ]
 
+const status = async (queue, type, id) => {
+  return new Promise((resolv, reject) => {
+    queue.create('status', {
+      id: id,
+      status: type
+    }).save(err => {
+      if(err) return reject()
+      return resolv()
+    })
+  })
+}
+
 const findMediaFiles = async absPath => {
   return new Promise((resolv, reject) => {
     const files = []
@@ -83,7 +95,10 @@ module.exports = async (config, queue, emitter) => {
         })
       })
     }, (err, results) => {
-      if(err) throw err;
+      if(err) {
+        debug('process-err', err)
+        return status(queue, 'error', file.id)
+      }
       debug(results)
 
       emitter.emit('convert', {

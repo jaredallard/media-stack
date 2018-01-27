@@ -74,7 +74,10 @@ module.exports = async (auth, opts) => {
   }
 
   const webhook  = await trello.addWebhook('Polls for updates on the media board.', opts.callbackUrl, opts.board)
-  if(typeof webhook !== 'object') throw new Error('Failed to create the webhook')
+  if(typeof webhook !== 'object') {
+    debug('webhook-error', webhook)
+    throw new Error('Failed to create the webhook')
+  }
   debug('created webhook', webhook)
 
   return
