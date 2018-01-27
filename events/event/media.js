@@ -32,12 +32,11 @@ module.exports = (emitter, queue, config) => {
 
     const metadataLabel = config.instance.labels.metadata
 
-
     const requestsBoard = config.instance.flow_ids.requests
     const readyBoard    = config.instance.flow_ids.ready
 
     if(listBefore !== requestsBoard) return debug('newMedia', 'origin not requests')
-    if(listNow !== readyBoard) return debug('newMedia', 'dest not ready')
+    if(listNow !== readyBoard)       return debug('newMedia', 'dest not ready')
 
     debug('newMedia', 'adding new media', `${cardId}/${cardName}`)
     const card        = await trello.makeRequest('get', `/1/cards/${cardId}`)
@@ -51,19 +50,15 @@ module.exports = (emitter, queue, config) => {
       name: 'MAL'
     })
 
-    if(download && source && mal) {
-      debug('newMedia', 'add-label', metadataLabel)
-      const labelResponse = await trello.makeRequest('post', `/1/cards/${cardId}/idLabels`, {
-        value: metadataLabel
-      })
-      debug(labelResponse)
-    } else {
+    if(!download || !source || !mal) {
       debug('newMedia', download, source, mal)
       return debug('newMedia', 'missing dl, source, or mal')
     }
 
-    debug(card)
-    debug(attachments)
+    debug('newMedia', 'add-label', metadataLabel)
+    await trello.makeRequest('post', `/1/cards/${cardId}/idLabels`, {
+      value: metadataLabel
+    })
 
     queue.create('newMedia', {
       id: cardId,

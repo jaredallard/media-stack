@@ -8,10 +8,15 @@
 
 'use strict';
 
-const _       = require('lodash')
-const Config  = require('../helpers/config')
-const debug   = require('debug')('media:events')
-const kue     = require('kue')
+const _        = require('lodash')
+const Config   = require('../helpers/config')
+const debug    = require('debug')('media:events')
+const kue      = require('kue')
+
+const memwatch = require('memwatch-next');
+
+const Event    = require('events').EventEmitter;
+const event    = new Event()
 
 const init = async () => {
   const config = await Config('events')
@@ -23,12 +28,17 @@ const init = async () => {
   // start the trello listener
   const events = await trello(config.keys.trello, {
     callbackUrl: config.instance.webhook,
-    board: config.instance.board
+    board: config.instance.board,
+    event: event
   })
 
   // media events
-  require('./event/media')(events, queue, config)
-  require('./event/status')(events, queue, config)
+  await require('./event/media')(event, queue, config)
+  await require('./event/status')(event, queue, config)
 }
 
 init()
+
+memwatch.on('leak', (info) => {
+  debug('info', info)
+});

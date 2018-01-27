@@ -23,17 +23,14 @@ module.exports = async (emitter, trelloEvents) => {
   app.use((req, res, next) => {
     //debug('got', req.body)
 
-    if(!req.body.action) return res.send()
+    if(!req.body.action || req.method === 'HEAD') return res.status(200).send()
 
     const action = req.body.action
     const type   = action.type
 
-    debug('trelloEvents', trelloEvents)
-
     if(trelloEvents[type]) trelloEvents[type].forEach(event => event(req.body, config))
 
-    debug('trello', type, action.id)
-
+    debug('emit', type)
     emitter.emit(type, action)
 
     return res.status(200).send()

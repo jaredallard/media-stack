@@ -12,6 +12,9 @@ const Config = require('../helpers/config')
 const kue    = require('kue')
 const queue  = kue.createQueue()
 
+const Event  = require('events').EventEmitter
+const event  = new Event()
+
 debug('init', Date.now())
 
 const init   = async () => {
@@ -20,14 +23,9 @@ const init   = async () => {
 
   console.log('config', config)
 
-  require('./lib/download')(config, queue)
+  await require('./lib/download')(config, queue, event)
+  await require('./lib/process')(config, queue, event)
+  await require('./lib/convert')(config, queue, event)
 }
-
-process.once( 'SIGTERM', function ( sig ) {
-  queue.shutdown( 5000, function(err) {
-    console.log( 'Kue shutdown: ', err||'' );
-    process.exit( 0 );
-  });
-});
 
 init()

@@ -48,7 +48,7 @@ const methods = {
    * @return {Promise}               You know what to do.
    */
   magnet: async (magnet, id, downloadPath) => {
-    debug('magnet', magnet)
+    debug('magnet', magnet.substr(0, 25)+'...')
     return new Promise((resolv, reject) => {
       client.add(magnet, torrent => {
         const hash = torrent.infoHash
@@ -79,14 +79,25 @@ const methods = {
   }
 }
 
-module.exports = async (config, queue) => {
+const status = async (queue, type, id) => {
+  return new Promise((resolv, reject) => {
+    queue.create('status', {
+      id: id,
+      status: type
+    }).save(err => {
+      if(err) return reject()
+      return resolv()
+    })
+  })
+}
+
+module.exports = async (config, queue, emitter) => {
 
   // Download new media.
   queue.process('newMedia', async (container, done) => {
     const data   = container.data
     const media  = data.media
     const fileId = data.id
-    debug('got', media)
 
     const downloadPath = path.join(__dirname, '..', config.instance.download_path, fileId)
 
@@ -101,11 +112,18 @@ module.exports = async (config, queue) => {
     const method = methods[protocol]
     if(!method) throw new Error('Protocol not supported.')
 
-    debug('download', fileId, downloadPath)
-    await mkdirp(downloadPath)
+    debug('downloading', fileId, downloadPath)
+    await status(queue, 'downloading', fileId)
+
     await method(url, fileId, downloadPath)
 
     debug('download', 'finished')
+    await status(queue, 'downloaded', fileId)
+
+    emitter.emit('process', {
+      id: fileId,
+      path: downloadPath
+    })
 
     return done(new Error('Error'))
   })

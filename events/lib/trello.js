@@ -11,8 +11,6 @@ const Trello = require('trello')
 const debug  = require('debug')('media:events:trello')
 const fs     = require('fs-extra')
 const path   = require('path')
-const Event  = require('events').EventEmitter;
-const event  = new Event()
 
 const TRELLO_DIR  = path.join(__dirname, '..', 'trello')
 const trelloTable = {
@@ -41,6 +39,8 @@ registerOneshots()
  * Create a trello webhook proccessor if needed.
  * Then setup the webhook listener.
  *
+ * @param {Object} auth  Authentication
+ * @param {Object} opts   optional engine stuff.
  * @return {Promise} ...
  */
 module.exports = async (auth, opts) => {
@@ -58,12 +58,10 @@ module.exports = async (auth, opts) => {
   opts.board = board.id
   debug('new-board-id', board.id)
 
-  const listener = require('./webhook')(event, trelloTable)
+  require('./webhook')(opts.event, trelloTable)
 
   // fetch webhooks
   const webhooks = await trello.makeRequest('get', `/1/tokens/${token}/webhooks`)
-  console.log(webhooks)
-
   const similarWebhooks = _.find(webhooks, {
     idModel: opts.board,
     active: true
@@ -71,13 +69,13 @@ module.exports = async (auth, opts) => {
 
   if(similarWebhooks) {
     debug('webhook-found', similarWebhooks)
-    // trello.deleteWebhook(similarWebhooks.id)
-    return event
+    trello.deleteWebhook(similarWebhooks.id)
+    debug('webhook-remove', similarWebhooks.id)
   }
 
   const webhook  = await trello.addWebhook('Polls for updates on the media board.', opts.callbackUrl, opts.board)
   if(typeof webhook !== 'object') throw new Error('Failed to create the webhook')
   debug('created webhook', webhook)
 
-  return event
+  return
 }
