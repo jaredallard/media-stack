@@ -1,0 +1,27 @@
+{
+  "name": "media-stack",
+  "version": "1.0.0",
+  "description": "Generic shared deps for the media stack",
+  "main": "index.js",
+  "repository": "https://github.com/jaredallard/media-stack",
+  "author": "Jared Allard <jaredallard@outlook.com>",
+  "license": "MIT",
+  "dependencies": {
+    "async": "^2.6.0",
+    "body-parser": "^1.18.2",
+    "debug": "^3.1.0",
+    "express": "^4.16.2",
+    "fs-extra": "^5.0.0",
+    "js-yaml": "^3.10.0",
+    "kue": "^0.11.6",
+    "lodash": "^4.17.4",
+    "mkdirp": "^0.5.1",
+    "request": "^2.83.0",
+    "request-promise-native": "^1.0.5",
+    "webtorrent": "^0.98.21"
+  },
+  "devDependencies": {
+    "babel-eslint": "^8.2.1",
+    "eslint": "^4.16.0"
+  }
+}

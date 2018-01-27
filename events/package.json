@@ -1,0 +1,13 @@
+{
+  "name": "media.events",
+  "version": "1.0.0",
+  "description": "Event Handler",
+  "main": "index.js",
+  "repository": "https://github.com/jaredallard/media-stack",
+  "author": "Jared Allard <jaredallard@outlook.com>",
+  "license": "MIT",
+  "dependencies": {
+    "kue": "^0.11.6",
+    "trello": "^0.8.0"
+  }
+}

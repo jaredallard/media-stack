@@ -1,0 +1,56 @@
+debug:
+  keys:
+    trello:
+      token: ''
+      key: ''
+    deploy:
+      type: 'ssh'
+      key: 'ssh-key'
+
+  instances:
+    default:
+      host: '127.0.0.1'
+    media:
+      location: '/mnt/media-v1/production'
+      types:
+        movie: '/movies'
+        tv: '/tv'
+    converter:
+      download_path: 'downloading'
+      transcoding_path: 'transcoding'
+      encoder: 'handbrake'
+      settings:
+        video:
+          codec: 'vp9'
+          profile: 'high'
+          quality: 18
+        audio:
+          codec: 'opus'
+          bitrate: '320kbps'
+        subtitles:
+          codec: 'copy'
+          strip_pictures: true
+      enabled: true
+    deploy:
+      droplet: 'type-of-droplet'
+      max_hours: 24
+    metrics:
+      port: 2000
+      type: 'all'
+    events:
+      board: 'vIGH0IiL'
+      webhook: "http://yourdomain/trello/callback"
+      flow_ids:
+        requests: 'list-id'
+        ready: '...'
+        downloading: ''
+        processing: ''
+        complete: ''
+        deployed: ''
+        templates: ''
+      labels:
+        metadata: 'label-id'
+      copy_checklists: true
+
+production:
+  above_stuff_but_prod: ''

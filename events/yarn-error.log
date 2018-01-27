@@ -1,0 +1,36 @@
+Arguments: 
+  /Users/jaredallard/.nvm/versions/node/v9.4.0/bin/node /usr/local/Cellar/yarn/1.3.2/libexec/bin/yarn.js init
+
+PATH: 
+  /usr/local/sbin:/Users/jaredallard/.bin:/Users/jaredallard/.cargo/bin:/usr/local/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/Users/jaredallard/.cargo/bin:/Users/jaredallard/.nvm/versions/node/v9.4.0/bin
+
+Yarn version: 
+  1.3.2
+
+Node version: 
+  9.4.0
+
+Platform: 
+  darwin x64
+
+npm manifest: 
+  No manifest
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
+
+Trace: 
+  Error: canceled
+      at Interface.<anonymous> (/usr/local/Cellar/yarn/1.3.2/libexec/lib/cli.js:121045:13)
+      at Interface.emit (events.js:160:13)
+      at Interface._ttyWrite (readline.js:784:16)
+      at ReadStream.onkeypress (readline.js:165:10)
+      at ReadStream.emit (events.js:160:13)
+      at emitKeys (internal/readline.js:420:14)
+      at emitKeys.next (<anonymous>)
+      at ReadStream.onData (readline.js:1020:36)
+      at ReadStream.emit (events.js:160:13)
+      at addChunk (_stream_readable.js:269:12)

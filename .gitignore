@@ -1,0 +1,5 @@
+config/config.yaml
+node_modules
+.DS_Store
+converter/downloading
+converter/transcoding
