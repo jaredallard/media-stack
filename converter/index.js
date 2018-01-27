@@ -20,9 +20,6 @@ debug('init', Date.now())
 const init   = async () => {
   const config = await Config('converter')
 
-
-  console.log('config', config)
-
   await require('./lib/download')(config, queue, event)
   await require('./lib/process')(config, queue, event)
   await require('./lib/convert')(config, queue, event)

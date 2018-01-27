@@ -111,7 +111,7 @@
           debug('hb-complete')
 
           // clear the end-but not complete catcher.
-          clearInterval(endCatch)
+          clearTimeout(endCatch)
 
           return next()
         })
