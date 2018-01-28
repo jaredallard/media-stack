@@ -1,0 +1,13 @@
+{
+  "name": "media.deploy",
+  "version": "1.0.0",
+  "description": "Spins up converter instances",
+  "main": "index.js",
+  "repository": "https://github.com/jaredallard/media-stack",
+  "author": "Jared Allard <jaredallard@outlook.com>",
+  "license": "MIT",
+  "dependencies": {
+    "digitalocean": "^0.12.0",
+    "ssh-keygen": "^0.4.1"
+  }
+}

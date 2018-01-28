@@ -4,3 +4,5 @@ node_modules
 converter/downloading
 converter/transcoding
 yarn-error.log
+deploy/ssh/key
+deploy/ssh/key.pub

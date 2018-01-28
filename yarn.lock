@@ -2555,6 +2555,10 @@ supports-color@^4.0.0:
   version "0.0.21"
   resolved "https://registry.yarnpkg.com/sylvester/-/sylvester-0.0.21.tgz#2987b1ce2bd2f38b0dce2a34388884bfa4400ea7"
 
+systeminformation@^3.33.18:
+  version "3.33.18"
+  resolved "https://registry.yarnpkg.com/systeminformation/-/systeminformation-3.33.18.tgz#2801cab8d4701f0e77fbdfea105f60bc917cd6bb"
+
 table@^4.0.1:
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/table/-/table-4.0.2.tgz#a33447375391e766ad34d3486e6e2aedc84d2e36"

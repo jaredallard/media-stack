@@ -20,6 +20,7 @@
     "node-ffprobe": "^1.2.2",
     "request": "^2.83.0",
     "request-promise-native": "^1.0.5",
+    "systeminformation": "^3.33.18",
     "webtorrent": "^0.98.21"
   },
   "devDependencies": {

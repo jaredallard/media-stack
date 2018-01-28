@@ -6,6 +6,10 @@
  * @version 1
  */
 
-module.exports = {
-  
+const sys = require('systeminformation')
+
+module.exports = async () => {
+  return {
+    filesystems: await sys.fsSize()
+  }
 }

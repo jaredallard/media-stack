@@ -60,7 +60,7 @@ module.exports = (emitter, queue, config) => {
       value: metadataLabel
     })
 
-    queue.create('newMedia', {
+    queue.create('deploy', {
       id: cardId,
       card: card,
       media: {

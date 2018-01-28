@@ -57,15 +57,34 @@ const methods = {
         debug('hash', hash)
         debug('files', torrent.files.length)
 
-        // TODO: check if the download has stalled
+        let lastProgress, stallHandler
         const downloadProgress = setInterval(() => {
           debug('download-progress', torrent.progress)
+
+          if(!stallHandler) {
+            lastProgress = torrent.progress
+            // check in 20000ms
+            stallHandler = setInterval(() => {
+              debug('check-download-progress', torrent.progress, lastProgress)
+
+              // create it all over again.
+              clearInterval(stallHandler)
+
+              if(torrent.progress === lastProgress) {
+                clearInterval(downloadProgress)
+                return reject('Download stalled.')
+              }
+              lastProgress = torrent.progress
+            }, 20000)
+          }
         }, 1000)
 
         async.eachLimit(torrent.files, 5,
           async file => torrentProcessor(file, id, downloadPath),
         err => { // I love that I can do this in a few lines.
           clearInterval(downloadProgress)
+          clearInterval(stallHandler)
+
           if(err) return reject(err)
           return resolv()
         })
@@ -116,13 +135,22 @@ const status = async (queue, type, id) => {
   })
 }
 
+// main function
 module.exports = async (config, queue, emitter) => {
-
   // Download new media.
   queue.process('newMedia', async (container, done) => {
-    const data   = container.data
-    const media  = data.media
-    const fileId = data.id
+    const sysInfo = await sys()
+    const data    = container.data
+    const media   = data.media
+    const fileId  = data.id
+
+    const ourFs   = _.find(sysInfo.filesystems, {
+      mount: '/'
+    })
+    const freeSpace = ourFs.size - ourFs.used
+
+    debug('drive:freeSpace', freeSpace)
+    debug('download', fileId, config.instance.download_path, data)
 
     const downloadPath = path.join(__dirname, '..', config.instance.download_path, fileId)
 
@@ -139,8 +167,12 @@ module.exports = async (config, queue, emitter) => {
 
     debug('downloading', fileId, downloadPath)
     await status(queue, 'downloading', fileId)
-
-    await method(url, fileId, downloadPath)
+    try {
+      await method(url, fileId, downloadPath)
+    } catch(err) {
+      await status(queue, 'error', fileId)
+      return done(err)
+    }
 
     debug('download', 'finished')
     await status(queue, 'downloaded', fileId)
