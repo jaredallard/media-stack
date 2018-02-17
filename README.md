@@ -16,12 +16,15 @@ A pipeline to allow media processing.
 **THIS IS LOSELY WRITTEN AND MAY NOT REFLECT FINAL PRODUCT**
 
  * Pull the repo down on a server `git clone <url> --recursive`
- * Either:
-   * `docker-compose up`
-   * Launch containers on separate servers.
  * Edit `config/service.yaml` to reflect various keys / server locations.
  * Upload generated deploy pubkey `./deploy/ssh/key.pub` onto your media server.
- * ... done!
+
+
+```bash
+docker-compose up
+```
+
+:tada:
 
 ## License
 

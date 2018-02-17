@@ -139,17 +139,10 @@ const status = async (queue, type, id) => {
 module.exports = async (config, queue, emitter) => {
   // Download new media.
   queue.process('newMedia', async (container, done) => {
-    const sysInfo = await sys()
     const data    = container.data
     const media   = data.media
     const fileId  = data.id
 
-    const ourFs   = _.find(sysInfo.filesystems, {
-      mount: '/'
-    })
-    const freeSpace = ourFs.size - ourFs.used
-
-    debug('drive:freeSpace', freeSpace)
     debug('download', fileId, config.instance.download_path, data)
 
     const downloadPath = path.join(__dirname, '..', config.instance.download_path, fileId)
@@ -166,6 +159,7 @@ module.exports = async (config, queue, emitter) => {
     if(!method) throw new Error('Protocol not supported.')
 
     debug('downloading', fileId, downloadPath)
+    mkdirp.sync(downloadPath)
     await status(queue, 'downloading', fileId)
     try {
       await method(url, fileId, downloadPath)
