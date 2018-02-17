@@ -15,7 +15,41 @@ if [[ -z "${SERVICE}" ]] || [[ ! -e "${SERVICE}" ]]; then
   exit 1
 fi
 
+REDIS_HOST=`echo $REDIS | sed 's/redis:\/\///g' | awk -F ':' '{ print $1 }'`
+REDIS_PORT=`echo $REDIS | awk -F ':' '{ print $3 }'`
+
+echo "INFO: waiting for redis '$REDIS' ($REDIS_HOST:$REDIS_PORT)"
+PING_RESPONSE=""
+while [[ $PING_RESPONSE != "PONG" ]]; do
+  PING_RESPONSE=`redis-cli -h $REDIS_HOST -p $REDIS_PORT PING`
+  echo $PING_RESPONSE
+  sleep 1
+done
+echo "INFO: redis is up"
+
 pushd "${SERVICE}" > /dev/null
+  # Create the config directory
+  if [[ ! -d "./config" ]]; then
+    mkdir ./config || exit 1
+  fi
+
+  # Check for kubernetes mounted secrets
+  if [[ ! -e "/mnt/config/config.yaml" ]]; then
+    echo "WARN: Config not found at /mnt/config, using environment variable"
+
+    if [[ -z "$CONFIG" ]]; then
+      echo "ERROR: Config not defined."
+      exit 2
+    fi
+
+    echo "INFO: inserting base64 decoded config into ./config/config.yaml"
+    echo "$CONFIG" | base64 -d > ./config/config.yaml
+  else
+    ln -svf /mnt/config/config.yaml ./config/config.yaml
+  fi
+
+  echo "INFO: bootstrap complete."
+
   yarn
 
   echo "cmd: $(pwd)"
