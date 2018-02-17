@@ -1,4 +1,4 @@
-version: '3'
+version: '3.3'
 services:
 
   # Redis Instance
@@ -14,15 +14,37 @@ services:
     environment:
       REDIS: 'redis://redis:6379'
     command: converter
+    volumes:
+      - ./config:/mnt/config
+    configs:
+      - source: config
+        target: /mnt/config/config.yaml
 
   events:
     build: ./
     environment:
       REDIS: 'redis://redis:6379'
     command: events
+    ports:
+      - 8002:3401 # Webhook
+    volumes:
+      - ./config:/mnt/config
+    configs:
+      - source: config
+        target: /mnt/config/config.yaml
 
   deploy:
     build: ./
     environment:
       REDIS: 'redis://redis:6379'
     command: deploy
+    volumes:
+      - ./config:/mnt/config
+    configs:
+      - source: config
+        target: /mnt/config/config.yaml
+
+# Only Docker Stack, fuck you Docker
+configs:
+  config:
+    file: config/config.yaml

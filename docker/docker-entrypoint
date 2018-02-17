@@ -27,29 +27,30 @@ while [[ $PING_RESPONSE != "PONG" ]]; do
 done
 echo "INFO: redis is up"
 
+# Bootstrap the configs
+# Create the config directory
+if [[ ! -d "./config" ]]; then
+  mkdir ./config || exit 1
+fi
+
+# Check for kubernetes mounted secrets
+if [[ ! -e "/mnt/config/config.yaml" ]]; then
+  echo "WARN: Config not found at /mnt/config, using environment variable"
+
+  if [[ -z "$CONFIG" ]]; then
+    echo "ERROR: Config not defined."
+    exit 2
+  fi
+
+  echo "INFO: inserting base64 decoded config into ./config/config.yaml"
+  echo "$CONFIG" | base64 -d > ./config/config.yaml
+else
+  ln -svf /mnt/config/config.yaml ./config/config.yaml
+fi
+
+
+echo "INFO: bootstrap complete."
 pushd "${SERVICE}" > /dev/null
-  # Create the config directory
-  if [[ ! -d "./config" ]]; then
-    mkdir ./config || exit 1
-  fi
-
-  # Check for kubernetes mounted secrets
-  if [[ ! -e "/mnt/config/config.yaml" ]]; then
-    echo "WARN: Config not found at /mnt/config, using environment variable"
-
-    if [[ -z "$CONFIG" ]]; then
-      echo "ERROR: Config not defined."
-      exit 2
-    fi
-
-    echo "INFO: inserting base64 decoded config into ./config/config.yaml"
-    echo "$CONFIG" | base64 -d > ./config/config.yaml
-  else
-    ln -svf /mnt/config/config.yaml ./config/config.yaml
-  fi
-
-  echo "INFO: bootstrap complete."
-
   yarn
 
   echo "cmd: $(pwd)"
