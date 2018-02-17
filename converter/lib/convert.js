@@ -53,6 +53,7 @@
    emitter.on('convert', async container => {
      await status(queue, 'processing', container.id)
 
+     // only ever convert max one media at a time.
      async.eachLimit(container.media, 1, (file, next) => {
        const audio  = file.audio
        const video  = file.video

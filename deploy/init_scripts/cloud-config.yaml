@@ -2,20 +2,10 @@
 package_update: true
 users:
   - name: deploy
-    groups: sudo
+    groups:
+      - sudo
+      - docker
     shell: /bin/bash
     sudo: ['ALL=(ALL) NOPASSWD:ALL']
     ssh-authorized-keys:
       - {{SSH_KEY}}
-runcmd:
-  - apt-get install apt-transport-https ca-certificates curl software-properties-common
-  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-  - add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-  - add-apt-repository -y ppa:stebbins/handbrake-git-snapshots
-  - apt-get update
-  - apt-get install -y docker-ce nodejs npm handbrake-cli ffmpeg
-  - usermod -a -G docker deploy
-  - sed -i -e '/^PermitRootLogin/s/^.*$/PermitRootLogin no/' /etc/ssh/sshd_config
-  - sed -i -e '$aAllowUsers deploy' /etc/ssh/sshd_config
-  - systemctl restart sshd
-  - docker run -e SERVICE_YAML='{{SERVICE_YAML}}' -p 8000:8000 jaredallard/media-stack converter

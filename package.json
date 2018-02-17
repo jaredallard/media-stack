@@ -5,6 +5,9 @@
   "main": "index.js",
   "repository": "https://github.com/jaredallard/media-stack",
   "author": "Jared Allard <jaredallard@outlook.com>",
+  "scripts": {
+    "start": "node index.js"
+  },
   "license": "MIT",
   "dependencies": {
     "async": "^2.6.0",

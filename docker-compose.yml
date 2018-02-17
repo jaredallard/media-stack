@@ -1,0 +1,26 @@
+version: '3'
+services:
+
+  # Redis Instance
+  redis:
+    image: redis
+
+  ###########################################
+  # Our Services
+  converter:
+    build: ./
+    environment:
+      REDIS: 'redis://redis:6379'
+    command: converter
+
+  events:
+    build: ./
+    environment:
+      REDIS: 'redis://redis:6379'
+    command: events
+
+  deploy:
+    build: ./
+    environment:
+      REDIS: 'redis://redis:6379'
+    command: deploy

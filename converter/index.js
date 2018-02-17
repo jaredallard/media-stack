@@ -9,8 +9,11 @@
 const _      = require('lodash')
 const debug  = require('debug')('media:converter')
 const Config = require('../helpers/config')
+const dyn    = require('../helpers/dynamics')
 const kue    = require('kue')
-const queue  = kue.createQueue()
+const queue  = kue.createQueue({
+  redis: dyn('redis')
+})
 
 const Event  = require('events').EventEmitter
 const event  = new Event()

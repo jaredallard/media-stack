@@ -10,6 +10,7 @@
 
 const _        = require('lodash')
 const Config   = require('../helpers/config')
+const dyn      = require('../helpers/dynamics')
 const debug    = require('debug')('media:events')
 const kue      = require('kue')
 
@@ -21,7 +22,9 @@ const event    = new Event()
 const init = async () => {
   const config = await Config('events')
   const trello = require('./lib/trello')
-  const queue  = kue.createQueue()
+  const queue  = kue.createQueue({
+    redis: dyn('redis')
+  })
 
   console.log('config', config)
 

@@ -10,8 +10,11 @@ const debug  = require('debug')('media:deploy')
 const Config = require('../helpers/config')
 const kue    = require('kue')
 const fs     = require('fs-extra')
+const dyn    = require('../helpers/dynamics')
 const path   = require('path')
-const queue  = kue.createQueue()
+const queue  = kue.createQueue({
+  redis: dyn('redis')
+})
 
 const Event  = require('events').EventEmitter
 const event  = new Event()
