@@ -1,9 +1,9 @@
 <p align="center">
-  ![Twilight Sparkle with books](https://raw.githubusercontent.com/jaredallard/media-stack/master/.github/twilight.png)
+  <img src="https://raw.githubusercontent.com/jaredallard/media-stack/master/.github/twilight.png" alt="Twilight Sparkle with books" />
 </p>
 
-<p style="font-size:2em;font-weight:bold;" align="center">
-  Twilight
+<p align="center">
+  <code>twilight</code>
 </p>
 
 <p align="center">Twilight organizes your media so you don't have too.</p>
