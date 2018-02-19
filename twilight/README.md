@@ -29,7 +29,7 @@ An example flow:
     type: 'tv'
   }
 ```
-2. **PUT** `/v1/media` 10 times with each file `multipart/form-data` with file as `file` or with all 10 under `files`
+2. **PUT** `/v1/media/<trello card id>` 10 times with each file `multipart/form-data` with file as `file` or with all 10 under `files`
 3. Media is sorted and placed in the correct directoy, and renamed based on rule-sets.
 
 
