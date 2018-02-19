@@ -14,6 +14,7 @@ services:
   converter:
     build: ./
     environment:
+      MEDIA: 'http://twilight:8001'
       REDIS: 'redis://redis:6379'
     command: converter
     volumes:
