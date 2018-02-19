@@ -46,6 +46,19 @@ services:
       - source: config
         target: /mnt/config/config.yaml
 
+  twilight:
+    build: ./
+    environment:
+      REDIS: 'redis://redis:6379'
+    command: twilight
+    ports:
+      - 8001:8001
+    volumes:
+      - ./config:/mnt/config
+    configs:
+      - source: config
+        target: /mnt/config/config.yaml
+
 # Only Docker Stack, fuck you Docker
 configs:
   config:

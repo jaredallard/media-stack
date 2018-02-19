@@ -103,6 +103,7 @@ module.exports = async (config, queue, emitter) => {
 
       emitter.emit('convert', {
         id: file.id,
+        card: file.card,
         media: results
       })
     })

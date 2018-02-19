@@ -26,6 +26,7 @@ const init   = async () => {
   await require('./lib/download')(config, queue, event)
   await require('./lib/process')(config, queue, event)
   await require('./lib/convert')(config, queue, event)
+  await require('./lib/deploy')(config, queue, event)
 }
 
 init()

@@ -51,11 +51,19 @@ const methods = {
   magnet: async (magnet, id, downloadPath) => {
     debug('magnet', magnet.substr(0, 25)+'...')
     return new Promise((resolv, reject) => {
+      const initStallHandler = setTimeout(() => {
+        debug('init-stall', 'timeout')
+        reject('Init stalled.')
+      }, 120000) // 2 minutes
+
       client.add(magnet, torrent => {
         const hash = torrent.infoHash
 
         debug('hash', hash)
         debug('files', torrent.files.length)
+
+        clearTimeout(initStallHandler)
+        debug('init-stall', 'clearing init timeout')
 
         let lastProgress, stallHandler
         const downloadProgress = setInterval(() => {
@@ -173,6 +181,7 @@ module.exports = async (config, queue, emitter) => {
 
     emitter.emit('process', {
       id: fileId,
+      card: data.card,
       path: downloadPath
     })
 

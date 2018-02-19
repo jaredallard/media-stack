@@ -8,10 +8,8 @@
 
  const _      = require('lodash')
  const fs     = require('fs-extra')
- const probe  = require('node-ffprobe')
  const path   = require('path')
  const debug  = require('debug')('media:converter:convert')
- const klaw   = require('klaw')
  const async  = require('async')
  const mkdirp = require('mkdirp')
 
@@ -139,7 +137,15 @@
        debug('encoding-err', err)
        if(err) return status(queue, 'error', container.id)
 
+       debug('media:files', container.media.length)
+
        status(queue, 'complete', container.id)
+
+       emitter.emit('deploy', {
+         id: container.id,
+         name: container.card.name,
+         files: container.media
+       })
      })
    })
  }

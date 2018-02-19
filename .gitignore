@@ -1,4 +1,6 @@
 config/config.yaml
+config/id_rsa
+config/id_rsa.pub
 node_modules
 .DS_Store
 converter/downloading
@@ -6,3 +8,4 @@ converter/transcoding
 yarn-error.log
 deploy/ssh/key
 deploy/ssh/key.pub
+twilight/media
