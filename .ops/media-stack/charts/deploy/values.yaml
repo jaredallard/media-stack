@@ -1,0 +1,14 @@
+replicaCount: 1
+
+image:
+  repository: jaredallard/media-stack
+  tag: latest
+  pullPolicy: Always
+
+resources: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

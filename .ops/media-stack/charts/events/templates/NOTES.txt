@@ -1,0 +1,3 @@
+Events is up!
+
+Websocker is at: events:8001

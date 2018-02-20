@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "twilight.name" . }}
+  labels:
+    app: {{ template "twilight.name" . }}
+    chart: {{ template "twilight.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8001
+      targetPort: 8001
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ template "twilight.name" . }}
+    release: {{ .Release.Name }}

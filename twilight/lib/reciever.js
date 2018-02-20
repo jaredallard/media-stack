@@ -19,6 +19,15 @@ app.use(bp.json())
 module.exports = (config, queue) => {
 
   /**
+   * Health Check
+   */
+  app.get('/health', (req, res) => {
+    return res.send({
+      message: 'It works!'
+    })
+  })
+
+  /**
    * Create a new media entry.
    */
   app.post('/v1/media', (req, res) => {

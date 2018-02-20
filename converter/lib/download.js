@@ -23,7 +23,7 @@ const torrentProcessor = async (file, id, downloadPath) => {
   return new Promise((resolv, reject) => {
     const dir = path.dirname(file.path)
     if(dir !== '') {
-      debug('mkdir', dir)
+      debug('mkdir', dir, file.path)
       mkdirp.sync(path.join(downloadPath, dir))
     }
 
@@ -38,6 +38,8 @@ const torrentProcessor = async (file, id, downloadPath) => {
     })
   })
 }
+
+const TIMEOUT = 240000
 
 const methods = {
   /**
@@ -54,7 +56,7 @@ const methods = {
       const initStallHandler = setTimeout(() => {
         debug('init-stall', 'timeout')
         reject('Init stalled.')
-      }, 120000) // 2 minutes
+      }, TIMEOUT) // 2 minutes
 
       client.add(magnet, torrent => {
         const hash = torrent.infoHash
@@ -83,11 +85,12 @@ const methods = {
                 return reject('Download stalled.')
               }
               lastProgress = torrent.progress
-            }, 20000)
+            }, TIMEOUT)
           }
-        }, 1000)
+        }, 60000) // 1 minute emit download progress stats
 
-        async.eachLimit(torrent.files, 5,
+        // might need top eachLimit this
+        async.each(torrent.files,
           async file => torrentProcessor(file, id, downloadPath),
         err => { // I love that I can do this in a few lines.
           clearInterval(downloadProgress)
