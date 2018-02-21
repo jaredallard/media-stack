@@ -27,6 +27,23 @@ docker-compose up
 
 :tada:
 
+## Production
+
+If you want to use this in production I highly recommend you setup a GCP instance
+or a [rancher](https://rancher.com) instance in the cloud with Kubernetes.
+
+Please configure the following labels on your nodes / rancher hosts:
+
+```bash
+triton.role:  bigdata (for converter)
+triton.role:  storage (for whatever machine has the emby volume on it)
+triton.state: stable  (for whatever machine has internet)
+```
+
+Modify `.ops/values.yaml` to reflect the external IP you have.
+
+Then install our helm chart: `cd .ops; helm install --name media media-stack`
+
 ## License
 
 BSD-3-Clause
