@@ -30,8 +30,18 @@ spec:
               readOnly: true
           ports:
             - name: webhook
-              containerPort: 8002
+              containerPort: 3401
               protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /v1/health
+              port: 3401
+            initialDelaySeconds: 60 # Events is super slow to start for some reason
+          readinessProbe:
+            httpGet:
+              path: /v1/health
+              port: 3401
+            initialDelaySeconds: 60 # Events is super slow to start for some reason
           resources:
 {{ toYaml .Values.resources | indent 12 }}
     {{- with .Values.nodeSelector }}

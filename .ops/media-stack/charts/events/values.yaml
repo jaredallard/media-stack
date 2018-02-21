@@ -12,3 +12,5 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+externalIps: {}

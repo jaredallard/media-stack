@@ -5,7 +5,11 @@ image:
   tag: latest
   pullPolicy: Always
 
-resources: {}
+resources:
+  requests:
+    cpu: 2
+    memory: 2Gi
+
 
 nodeSelector: {}
 

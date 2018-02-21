@@ -11,9 +11,13 @@ spec:
   type: ClusterIP
   ports:
     - port: 8002
-      targetPort: 8002
+      targetPort: 3401
       protocol: TCP
       name: webhook
   selector:
     app: {{ template "events.name" . }}
     release: {{ .Release.Name }}
+{{- with .Values.externalIps }}
+  externalIps:
+{{ toYaml . | indent 4 }}
+{{- end }}

@@ -9,3 +9,4 @@ yarn-error.log
 deploy/ssh/key
 deploy/ssh/key.pub
 twilight/media
+.ops/media-stack/charts/*.tgz

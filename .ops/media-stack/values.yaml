@@ -1,0 +1,28 @@
+
+
+# Redis configuration
+redis:
+  nodeSelector:
+    triton.state: stable
+  usePassword: false
+  persistence: # don't persist jobs
+    enabled: false
+
+# Service configuration
+deploy:
+  nodeSelector:
+    triton.state: stable
+
+events:
+  nodeSelector:
+    triton.state: stable
+  externalIps: # Hardcode the prod instance IP
+    - 159.65.73.149
+
+twilight:
+  nodeSelector:
+    triton.state: stable
+
+converter:
+  nodeSelector:
+    triton.role: bigdata

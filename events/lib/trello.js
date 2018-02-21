@@ -43,7 +43,8 @@ registerOneshots()
  * @param {Object} opts   optional engine stuff.
  * @return {Promise} ...
  */
-module.exports = async (auth, opts) => {
+
+const init = async (auth, opts) => {
   const token = auth.token
   const key   = auth.key
 
@@ -76,9 +77,20 @@ module.exports = async (auth, opts) => {
   const webhook  = await trello.addWebhook('Polls for updates on the media board.', opts.callbackUrl, opts.board)
   if(typeof webhook !== 'object') {
     debug('webhook-error', webhook)
-    throw new Error('Failed to create the webhook')
+
+    // Recursive function to ensure that we create the webhook
+    return new Promise(resolv => {
+      debug('webhook-retry', 'waiting 5000ms')
+      setTimeout(async () => {
+        await init(auth, opts)
+
+        return resolv()
+      }, 5000)
+    })
   }
   debug('created webhook', webhook)
 
   return
 }
+
+module.exports = init

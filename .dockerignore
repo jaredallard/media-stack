@@ -4,3 +4,5 @@ node_module
 */node_modules
 */downloading
 config
+.ops
+.github
