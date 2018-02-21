@@ -35,6 +35,8 @@ const registerOneshots = async () => {
 
 registerOneshots()
 
+let webhookDef = null;
+
 /**
  * Create a trello webhook proccessor if needed.
  * Then setup the webhook listener.
@@ -43,7 +45,6 @@ registerOneshots()
  * @param {Object} opts   optional engine stuff.
  * @return {Promise} ...
  */
-
 const init = async (auth, opts) => {
   const token = auth.token
   const key   = auth.key
@@ -59,7 +60,7 @@ const init = async (auth, opts) => {
   opts.board = board.id
   debug('new-board-id', board.id)
 
-  require('./webhook')(opts.event, trelloTable)
+  if(!webhookDef) webhookDef = require('./webhook')(opts.event, trelloTable)
 
   // fetch webhooks
   const webhooks = await trello.makeRequest('get', `/1/tokens/${token}/webhooks`)
