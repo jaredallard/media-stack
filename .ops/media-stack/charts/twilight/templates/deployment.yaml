@@ -23,7 +23,7 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: [ "twilight" ]
+          command: [ "/usr/bin/docker-entrypoint", "twilight" ]
           volumeMounts:
             - name: config
               mountPath: "/mnt/config"
