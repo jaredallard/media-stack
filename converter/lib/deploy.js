@@ -36,6 +36,8 @@ module.exports = (config, queue, emitter) => {
     const type = 'tv'
     debug('deploy', job, media_host)
 
+    job.job.progress(201, 300, 'deploying')
+
     // create the new media
     debug('deploy:create', job.name, job.id)
     try {
@@ -71,7 +73,9 @@ module.exports = (config, queue, emitter) => {
     }, err => {
       if(err) throw err;
 
+      job.job.progress(300, 300, 'deployed')
       debug('deploy', 'successfully deployed')
+      job.job.done()
       status(queue, 'deployed', job.id)
     })
   })

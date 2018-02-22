@@ -9,6 +9,7 @@ CMD=$2
 
 # Enable service debugging
 export DEBUG="media:*"
+export DEBUG_COLORS=true
 
 echo "Started: $(date)"
 echo "opts: $@"
@@ -24,13 +25,18 @@ if [[ -z "$REDIS" ]]; then
   echo "WARN: \$REDIS undefined, defaulting to prod config..."
 fi
 
+if [[ -z "$MEDIA" ]]; then
+  export MEDIA="http://twilight:8001"
+  echo "WARN: \$MEDIA undefined, defaulting to prod config..."
+fi
+
 REDIS_HOST=`echo $REDIS | sed 's/redis:\/\///g' | awk -F ':' '{ print $1 }'`
 REDIS_PORT=`echo $REDIS | awk -F ':' '{ print $3 }'`
 
 echo "INFO: waiting for redis '$REDIS' ($REDIS_HOST:$REDIS_PORT)"
 PING_RESPONSE=""
 while [[ $PING_RESPONSE != "PONG" ]]; do
-  PING_RESPONSE=`timeout 3 redis-cli -h $REDIS_HOST -p $REDIS_PORT PING`
+  PING_RESPONSE=`timeout -t 3 redis-cli -h $REDIS_HOST -p $REDIS_PORT PING`
   echo $PING_RESPONSE
   sleep 1
 done
@@ -60,7 +66,7 @@ fi
 
 echo "INFO: bootstrap complete."
 pushd "${SERVICE}" > /dev/null
-  yarn install --verbose
+  yarn install
 
   echo "cmd: $(pwd)"
   echo -n "exec: "

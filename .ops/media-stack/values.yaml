@@ -10,19 +10,23 @@ redis:
 
 # Service configuration
 deploy:
+  environment: production
   nodeSelector:
     triton.state: stable
 
 events:
+  environment: production
   nodeSelector:
     triton.state: stable
   externalIps: # Hardcode the prod instance IP
     - 159.65.73.149
 
 twilight:
+  environment: production
   nodeSelector:
     triton.state: stable
 
 converter:
+  environment: production
   nodeSelector:
     triton.role: bigdata

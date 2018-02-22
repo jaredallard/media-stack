@@ -48,9 +48,10 @@ const methods = {
    * @param {String} magnet          magnet link
    * @param {String} id              File ID
    * @param {String} downloadPath    Path to save file(s) in
+   * @param {Object} job             Job Object
    * @return {Promise}               You know what to do.
    */
-  magnet: async (magnet, id, downloadPath) => {
+  magnet: async (magnet, id, downloadPath, job) => {
     debug('magnet', magnet.substr(0, 25)+'...')
     return new Promise((resolv, reject) => {
       const initStallHandler = setTimeout(() => {
@@ -58,7 +59,9 @@ const methods = {
         reject('Init stalled.')
       }, TIMEOUT) // 2 minutes
 
-      client.add(magnet, torrent => {
+      client.add(magnet, {
+        path: downloadPath
+      }, torrent => {
         const hash = torrent.infoHash
 
         debug('hash', hash)
@@ -70,6 +73,9 @@ const methods = {
         let lastProgress, stallHandler
         const downloadProgress = setInterval(() => {
           debug('download-progress', torrent.progress)
+
+          // 0 - 1 * 100 = /100
+          job.progress(torrent.progress * 100, 300, 'downloading')
 
           if(!stallHandler) {
             lastProgress = torrent.progress
@@ -89,14 +95,19 @@ const methods = {
           }
         }, 60000) // 1 minute emit download progress stats
 
-        // might need top eachLimit this
-        async.each(torrent.files,
-          async file => torrentProcessor(file, id, downloadPath),
-        err => { // I love that I can do this in a few lines.
+        torrent.on('error', err => {
+          client.remove(hash)
+          return reject(err)
+        })
+
+        torrent.on('done', () => {
+          debug('done', hash)
+
           clearInterval(downloadProgress)
           clearInterval(stallHandler)
 
-          if(err) return reject(err)
+          client.remove(hash)
+
           return resolv()
         })
       })
@@ -109,10 +120,10 @@ const methods = {
    * @param  {String} resourceUrl   resource url
    * @param  {String} id            File ID
    * @param  {String} downloadPath  Path to download file too
-   * @param  {String} path          to save files in
+   * @param  {Object} job           Job Object
    * @return {Promise}              .then/.catch etc
    */
-  http: async (resourceUrl, id, downloadPath) => {
+  http: async (resourceUrl, id, downloadPath, job) => {
     debug('http', resourceUrl)
 
     return new Promise(async (resolv, reject) => {
@@ -149,14 +160,20 @@ const status = async (queue, type, id) => {
 // main function
 module.exports = async (config, queue, emitter) => {
   // Download new media.
-  queue.process('newMedia', async (container, done) => {
+  queue.process('newMedia', 1, async (container, done) => {
     const data    = container.data
     const media   = data.media
     const fileId  = data.id
 
     debug('download', fileId, config.instance.download_path, data)
 
-    const downloadPath = path.join(__dirname, '..', config.instance.download_path, fileId)
+    let pathPrefix = ''
+    if(!path.isAbsolute(config.instance.download_path)) {
+      debug('path:not-absolute')
+      pathPrefix = path.join(__dirname, '..')
+    }
+
+    const downloadPath = path.join(pathPrefix, config.instance.download_path, fileId)
 
     const download = /(\w+):([^)(\s]+)/g.exec(media.download)
     const url      = download[0]
@@ -173,7 +190,7 @@ module.exports = async (config, queue, emitter) => {
     mkdirp.sync(downloadPath)
     await status(queue, 'downloading', fileId)
     try {
-      await method(url, fileId, downloadPath)
+      await method(url, fileId, downloadPath, container)
     } catch(err) {
       await status(queue, 'error', fileId)
       return done(err)
@@ -182,12 +199,15 @@ module.exports = async (config, queue, emitter) => {
     debug('download', 'finished')
     await status(queue, 'downloaded', fileId)
 
+    container.progress(100, 300, 'downloading')
+
     emitter.emit('process', {
+      job: container,
       id: fileId,
       card: data.card,
       path: downloadPath
     })
 
-    return done(new Error('Error'))
+    container.done = err => done(err)
   })
 }

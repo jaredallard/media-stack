@@ -48,7 +48,7 @@ module.exports = async (emitter, queue, opts) => {
       id: data.id,
       card: data.card,
       media: data.media
-    }).save()
+    }).attempts(3).save()
 
     return done()
   })

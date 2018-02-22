@@ -11,10 +11,7 @@
 const _        = require('lodash')
 const Config   = require('../helpers/config')
 const dyn      = require('../helpers/dynamics')
-const debug    = require('debug')('media:events')
 const kue      = require('kue')
-
-const memwatch = require('memwatch-next');
 
 const Event    = require('events').EventEmitter;
 const event    = new Event()
@@ -41,7 +38,3 @@ const init = async () => {
 }
 
 init()
-
-memwatch.on('leak', (info) => {
-  debug('info', info)
-});

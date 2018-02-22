@@ -5,6 +5,8 @@ image:
   tag: latest
   pullPolicy: Always
 
+environment: debug
+
 resources: {}
 
 nodeSelector: {}

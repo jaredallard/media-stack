@@ -24,6 +24,9 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/usr/bin/docker-entrypoint", "events"]
+          env:
+            - name: NODE_ENV
+              value: {{ .Values.environment }}
           volumeMounts:
             - name: config
               mountPath: "/mnt/config"

@@ -69,7 +69,7 @@ module.exports = (emitter, queue, config) => {
         download: download,
         type: 'unknown'
       }
-    }).save(err => {
+    }).removeOnComplete( true ).save(err => {
       if(err) return debug('newMedia', 'failed to add to queue')
     })
   })

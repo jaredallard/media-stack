@@ -30,3 +30,12 @@ const init   = async () => {
 }
 
 init()
+
+process.on('unhandledRejection', error => {
+  debug('Uncaught Execption:', error)
+
+  queue.shutdown(1000, err => {
+    debug('kue:shutdown', err)
+    process.exit(1);
+  });
+});

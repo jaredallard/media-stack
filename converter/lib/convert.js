@@ -85,6 +85,9 @@
 
        let progressReporter = setInterval(() => {
          debug('progress', container.id, filename, progress, eta)
+
+         // add 100 since this is the second stage
+         container.job.progress(100+progress, 300, 'converting')
        }, 10000)
 
        let progress, eta, endCatch, completed;
@@ -135,14 +138,20 @@
         })
      }, err => {
        debug('encoding-err', err)
-       if(err) return status(queue, 'error', container.id)
+       if(err) {
+         container.job.done(err)
+         return status(queue, 'error', container.id)
+       }
 
        debug('media:files', container.media.length)
 
        status(queue, 'complete', container.id)
 
+       container.job.progress(200, 300, 'converting')
+
        emitter.emit('deploy', {
          id: container.id,
+         job: container.job,
          name: container.card.name,
          files: container.media
        })

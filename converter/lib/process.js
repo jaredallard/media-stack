@@ -97,11 +97,14 @@ module.exports = async (config, queue, emitter) => {
     }, (err, results) => {
       if(err) {
         debug('process-err', err)
+
+        file.job.done('Failed to process')
         return status(queue, 'error', file.id)
       }
       debug(results)
 
       emitter.emit('convert', {
+        job: file.job,
         id: file.id,
         card: file.card,
         media: results

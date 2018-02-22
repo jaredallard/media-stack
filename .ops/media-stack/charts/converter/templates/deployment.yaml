@@ -24,10 +24,15 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/usr/bin/docker-entrypoint", "converter"]
+          env:
+            - name: NODE_ENV
+              value: {{ .Values.environment }}
           volumeMounts:
             - name: config
               mountPath: "/mnt/config"
               readOnly: true
+            - name: downloading
+              mountPath: "/mnt/downloading"
           resources:
 {{ toYaml .Values.resources | indent 12 }}
     {{- with .Values.nodeSelector }}
@@ -47,3 +52,5 @@ spec:
         - name: config
           secret:
             secretName: media-config
+        - name: downloading
+          emptyDir: {}
