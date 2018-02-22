@@ -44,7 +44,6 @@ spec:
             httpGet:
               path: /v1/health
               port: 3401
-            initialDelaySeconds: 60 # Events is super slow to start for some reason
           resources:
 {{ toYaml .Values.resources | indent 12 }}
     {{- with .Values.nodeSelector }}

@@ -39,6 +39,7 @@ spec:
             httpGet:
               path: /health
               port: 8001
+            initialDelaySeconds: 60 # don't recreate until after 60s+
           readinessProbe:
             httpGet:
               path: /health
