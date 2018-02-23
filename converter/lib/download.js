@@ -6,37 +6,14 @@
  * @version 1
  */
 
-const _          = require('lodash')
-const sys        = require('../../helpers/sys.js')
 const Webtorrent = require('webtorrent')
 const request    = require('request-promise-native')
 const path       = require('path')
 const fs         = require('fs-extra')
 const mkdirp     = require('mkdirp')
-const async      = require('async')
 const url        = require('url')
 
 const client     = new Webtorrent()
-
-const torrentProcessor = async (file, id, downloadPath) => {
-  return new Promise((resolv, reject) => {
-    const dir = path.dirname(file.path)
-    if(dir !== '') {
-      debug('mkdir', dir, file.path)
-      mkdirp.sync(path.join(downloadPath, dir))
-    }
-
-    const realPath = path.join(downloadPath, file.path)
-
-    const write = fs.createWriteStream(realPath)
-    file.createReadStream().pipe(write)
-
-    write.on('close', () => {
-      debug('file', file.path, 'is done')
-      return resolv()
-    })
-  })
-}
 
 const TIMEOUT = 240000
 
