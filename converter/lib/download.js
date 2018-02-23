@@ -158,11 +158,13 @@ const status = async (queue, type, id) => {
 module.exports = async (config, queue, emitter) => {
 
   emitter.once('download', async job => {
-    const data   = job.data
+    const data   = job.card
     const media  = job.media
     const fileId = job.id
 
-    debug('download', fileId, config.instance.download_path, data)
+    debug('download:id',   fileId)
+    debug('download:name', data.name)
+    debug('download:path', config.instance.download_path)
 
     let pathPrefix = ''
     if(!path.isAbsolute(config.instance.download_path)) {

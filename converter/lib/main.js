@@ -34,10 +34,9 @@ module.exports = async (config, queue) => {
 
     const staticData = {
       id: fileId,
-      card: data,
+      card: data.card,
       media: media
     }
-
 
     // callback system to keep scope
     emitter.on('done', data => {
@@ -73,7 +72,7 @@ module.exports = async (config, queue) => {
       debug('media:job:errored', fileId)
       return done(data.data)
     })
-    
+
     // dynamically generate our stages
     async.forEach(stages, async stage => {
       debug('instance:create', stage)

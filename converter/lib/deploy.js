@@ -15,36 +15,23 @@ const Config  = require('../../helpers/config.js')
 const dyn     = require('../../helpers/dynamics.js')
 const request = require('request-promise-native')
 
-const status = async (queue, type, id) => {
-  return new Promise((resolv, reject) => {
-    queue.create('status', {
-      id: id,
-      status: type
-    }).save(err => {
-      if(err) return reject()
-      return resolv()
-    })
-  })
-}
-
 module.exports = (config, queue, emitter) => {
   emitter.once('deploy', async job => {
     const mediaConfig = await Config('media') // for types
     const media_host  = dyn('media')
+    const name        = job.card.name
 
     // TODO: add support for movie
     const type = 'tv'
     debug('deploy', job, media_host)
 
-    job.job.progress(201, 300, 'deploying')
-
     // create the new media
-    debug('deploy:create', job.name, job.id)
+    debug('deploy:create', name, job.id)
     await request({
       method: 'POST',
       url: `${media_host}/v1/media`,
       body: {
-        name: job.name,
+        name: name,
         id: job.id,
         files: job.files.length,
         type: type
@@ -60,8 +47,7 @@ module.exports = (config, queue, emitter) => {
         url: `${media_host}/v1/media/${job.id}`,
         method: 'PUT',
         form: {
-          file: fs.createReadStream(file.path),
-          rel_path: file.path
+          file: fs.createReadStream(file.path)
         }
       })
     }, err => {

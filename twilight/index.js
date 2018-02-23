@@ -23,7 +23,7 @@ debug('init', Date.now())
 const init   = async () => {
   const config = await Config('media')
 
-  require('./lib/reciever')(config, queue, event)
+  await require('./lib/reciever')(config, queue, event)
 }
 
 init()
