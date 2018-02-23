@@ -74,9 +74,6 @@ const methods = {
         const downloadProgress = setInterval(() => {
           debug('download-progress', torrent.progress)
 
-          // 0 - 1 * 100 = /100
-          job.progress(torrent.progress * 100, 300, 'downloading')
-
           if(!stallHandler) {
             lastProgress = torrent.progress
             // check in 20000ms
@@ -123,7 +120,7 @@ const methods = {
    * @param  {Object} job           Job Object
    * @return {Promise}              .then/.catch etc
    */
-  http: async (resourceUrl, id, downloadPath, job) => {
+  http: async (resourceUrl, id, downloadPath) => {
     debug('http', resourceUrl)
 
     return new Promise(async (resolv, reject) => {
@@ -159,11 +156,11 @@ const status = async (queue, type, id) => {
 
 // main function
 module.exports = async (config, queue, emitter) => {
-  // Download new media.
-  queue.process('newMedia', 1, async (container, done) => {
-    const data    = container.data
-    const media   = data.media
-    const fileId  = data.id
+
+  emitter.once('download', async job => {
+    const data   = job.data
+    const media  = job.media
+    const fileId = job.id
 
     debug('download', fileId, config.instance.download_path, data)
 
@@ -175,12 +172,11 @@ module.exports = async (config, queue, emitter) => {
 
     const downloadPath = path.join(pathPrefix, config.instance.download_path, fileId)
 
-    const download = /(\w+):([^)(\s]+)/g.exec(media.download)
-    const url      = download[0]
+    const download     = /(\w+):([^)(\s]+)/g.exec(media.download)
+    const url          = download[0]
 
-    let protocol = download[1]
+    let protocol       = download[1]
 
-    // DO NOT EVER. EVER. Construct the url via the protocol. Always use the input.
     if(protocol === 'https') protocol = 'http'
 
     const method = methods[protocol]
@@ -190,24 +186,24 @@ module.exports = async (config, queue, emitter) => {
     mkdirp.sync(downloadPath)
     await status(queue, 'downloading', fileId)
     try {
-      await method(url, fileId, downloadPath, container)
+      await method(url, fileId, downloadPath)
     } catch(err) {
       await status(queue, 'error', fileId)
-      return done(err)
+
+      return emitter.emit('done', {
+        next: 'error',
+        data: err
+      })
     }
 
     debug('download', 'finished')
     await status(queue, 'downloaded', fileId)
 
-    container.progress(100, 300, 'downloading')
-
-    emitter.emit('process', {
-      job: container,
-      id: fileId,
-      card: data.card,
-      path: downloadPath
+    emitter.emit('done', {
+      next: 'process',
+      data: {
+        path: downloadPath
+      }
     })
-
-    container.done = err => done(err)
   })
 }

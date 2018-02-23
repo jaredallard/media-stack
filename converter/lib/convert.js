@@ -48,18 +48,24 @@
      ab: settings.audio.bitrate
    }
 
-   emitter.on('convert', async container => {
-     await status(queue, 'processing', container.id)
+   emitter.once('convert', async job => {
+     emitter.emit('status', 'processing')
+
+     const files = job.data.media
 
      // only ever convert max one media at a time.
-     async.eachLimit(container.media, 1, (file, next) => {
+     const newFiles = []
+     async.eachLimit(files, 1, (file, next) => {
        const audio  = file.audio
        const video  = file.video
 
+       debug('file', file)
+
        const filename = path.basename(file.path.replace(/\.\w+$/, '.mkv'))
-       const output = path.join(transcoding_path, container.id, filename)
+       const output = path.join(transcoding_path, job.id, filename)
 
        debug('convert', filename, '->', output)
+       newFiles.push(output)
 
        // don't convert compatible containers
        if(audio.length === 0 && video.length === 0) return next(null)
@@ -84,10 +90,7 @@
        }, 20000)
 
        let progressReporter = setInterval(() => {
-         debug('progress', container.id, filename, progress, eta)
-
-         // add 100 since this is the second stage
-         container.job.progress(100+progress, 300, 'converting')
+         debug('progress', job.id, filename, progress, eta)
        }, 10000)
 
        let progress, eta, endCatch, completed;
@@ -137,23 +140,16 @@
           clearInterval(progressReporter)
         })
      }, err => {
-       debug('encoding-err', err)
-       if(err) {
-         container.job.done(err)
-         return status(queue, 'error', container.id)
-       }
+       if(err) throw err;
 
-       debug('media:files', container.media.length)
+       debug('media:files', files.length)
 
-       status(queue, 'complete', container.id)
-
-       container.job.progress(200, 300, 'converting')
-
+       emitter.emit('status', 'complete')
        emitter.emit('deploy', {
-         id: container.id,
-         job: container.job,
-         name: container.card.name,
-         files: container.media
+         next: 'deploy',
+         data: {
+          files: newFiles
+         }
        })
      })
    })

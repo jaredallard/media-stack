@@ -66,7 +66,8 @@ module.exports = async (config, queue, emitter) => {
   debug('want', audioCodec, videoCodec)
 
   // determine if we need to process or not.
-  emitter.on('process', async file => {
+  emitter.once('process', async job => {
+    const file = job.data
     debug('process', file)
 
     const listOfFiles = await findMediaFiles(file.path)
@@ -103,11 +104,11 @@ module.exports = async (config, queue, emitter) => {
       }
       debug(results)
 
-      emitter.emit('convert', {
-        job: file.job,
-        id: file.id,
-        card: file.card,
-        media: results
+      emitter.emit('done', {
+        next: 'convert',
+        data: {
+          media: results
+        }
       })
     })
   })

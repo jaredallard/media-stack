@@ -15,18 +15,12 @@ const queue  = kue.createQueue({
   redis: dyn('redis')
 })
 
-const Event  = require('events').EventEmitter
-const event  = new Event()
-
 debug('init', Date.now())
 
 const init   = async () => {
   const config = await Config('converter')
 
-  await require('./lib/download')(config, queue, event)
-  await require('./lib/process')(config, queue, event)
-  await require('./lib/convert')(config, queue, event)
-  await require('./lib/deploy')(config, queue, event)
+  await require('./lib/main')(config, queue)
 }
 
 init()

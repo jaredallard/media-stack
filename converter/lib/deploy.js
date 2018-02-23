@@ -28,7 +28,7 @@ const status = async (queue, type, id) => {
 }
 
 module.exports = (config, queue, emitter) => {
-  emitter.on('deploy', async job => {
+  emitter.once('deploy', async job => {
     const mediaConfig = await Config('media') // for types
     const media_host  = dyn('media')
 

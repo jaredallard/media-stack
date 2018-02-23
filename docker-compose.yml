@@ -29,7 +29,7 @@ services:
       REDIS: 'redis://redis:6379'
     command: events
     ports:
-      - 8002:3401 # Webhook
+      - 3401:3401 # Webhook
     volumes:
       - ./config:/mnt/config
     configs:
