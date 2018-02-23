@@ -48,7 +48,7 @@ module.exports = (config, queue, emitter) => {
       await request({
         url: `${media_host}/v1/media/${job.id}`,
         method: 'PUT',
-        form: {
+        formData: {
           file: fs.createReadStream(file)
         }
       })
