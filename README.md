@@ -8,9 +8,9 @@ A pipeline to allow media processing.
   * [API](./api) - Allows you to view statistics about the media, i.e processing status
   * [Deploy](./deploy) - Handles orchestration of Digital Ocean instances
   * [Events](./events) - Queues media and orchestrates new media into the pipeline
-  * [Metrics](./metrics) - Gathers information on the platform and new media
   * [Converter](./converter) - Converts media (may change w/ deploy)
   * [Twilight](./twilight) - Organizes and deploys new media. Runs on storage host.
+  * [Beholder](./beholder) - Watches over the platform (metrics and etc)
 
 ## Setup
 
