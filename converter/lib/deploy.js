@@ -20,34 +20,36 @@ module.exports = (config, queue, emitter) => {
     const mediaConfig = await Config('media') // for types
     const media_host  = dyn('media')
     const name        = job.card.name
+    const data        = job.data
+    const files       = data.files
 
     // TODO: add support for movie
     const type = 'tv'
-    debug('deploy', job, media_host)
+    debug('deploy', data, media_host)
 
     // create the new media
-    debug('deploy:create', name, job.id)
+    debug('deploy:create', name, type, job.id)
     await request({
       method: 'POST',
       url: `${media_host}/v1/media`,
       body: {
         name: name,
         id: job.id,
-        files: job.files.length,
+        files: files.length,
         type: type
       },
       json: true
     })
 
     debug('deploy', 'starting file upload')
-    async.eachLimit(job.files, 1, async file => {
-      debug('upload', `${job.id} --- ${file.path}`)
+    async.eachLimit(files, 1, async file => {
+      debug('upload', `${job.id} --- ${file}`)
 
       await request({
         url: `${media_host}/v1/media/${job.id}`,
         method: 'PUT',
         form: {
-          file: fs.createReadStream(file.path)
+          file: fs.createReadStream(file)
         }
       })
     }, err => {

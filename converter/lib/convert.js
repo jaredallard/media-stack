@@ -133,7 +133,7 @@
        debug('media:files', files.length)
 
        emitter.emit('status', 'complete')
-       emitter.emit('deploy', {
+       emitter.emit('done', {
          next: 'deploy',
          data: {
           files: newFiles

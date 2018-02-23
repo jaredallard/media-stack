@@ -30,6 +30,7 @@ module.exports = async (config, queue) => {
 
     debug('media:job', fileId)
     debug('emitter:new', fileId)
+    debug('media:attempts', `${container._attempts || 1}/${container._max_attempts}`)
     const emitter = EmitterTable[fileId] = new EventEmitter()
 
     const staticData = {
@@ -64,6 +65,16 @@ module.exports = async (config, queue) => {
         status
       }).save(err => {
         if(err) return debug('status:err', fileId, err)
+      })
+    })
+
+    emitter.on('progess', (percent, stage) => {
+      queue.create('progress', {
+        id: fileId,
+        percent,
+        stage
+      }).save(err => {
+        if(err) return debug('progress:err', fileId, err)
       })
     })
 
