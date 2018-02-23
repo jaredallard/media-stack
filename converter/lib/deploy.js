@@ -40,23 +40,17 @@ module.exports = (config, queue, emitter) => {
 
     // create the new media
     debug('deploy:create', job.name, job.id)
-    try {
-      await request({
-        method: 'POST',
-        url: `${media_host}/v1/media`,
-        body: {
-          name: job.name,
-          id: job.id,
-          files: job.files.length,
-          type: type
-        },
-        json: true
-      })
-    } catch(e) {
-      debug('deploy', 'failed to create release')
-      status(queue, 'error', job.id)
-      throw e;
-    }
+    await request({
+      method: 'POST',
+      url: `${media_host}/v1/media`,
+      body: {
+        name: job.name,
+        id: job.id,
+        files: job.files.length,
+        type: type
+      },
+      json: true
+    })
 
     debug('deploy', 'starting file upload')
     async.eachLimit(job.files, 1, async file => {
@@ -73,10 +67,9 @@ module.exports = (config, queue, emitter) => {
     }, err => {
       if(err) throw err;
 
-      job.job.progress(300, 300, 'deployed')
       debug('deploy', 'successfully deployed')
-      job.job.done()
-      status(queue, 'deployed', job.id)
+      emitter.emit('status', 'deployed')
+      return emitter.emit('done')
     })
   })
 };

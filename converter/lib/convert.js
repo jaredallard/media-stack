@@ -15,18 +15,6 @@
 
  const conv   = require('../../helpers/handbrake-js/lib/handbrake-js.js')
 
- const status = async (queue, type, id) => {
-   return new Promise((resolv, reject) => {
-     queue.create('status', {
-       id: id,
-       status: type
-     }).save(err => {
-       if(err) return reject()
-       return resolv()
-     })
-   })
- }
-
  module.exports = (config, queue, emitter) => {
    const settings = config.instance.settings
    const transcoding_path = path.join(
