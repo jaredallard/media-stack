@@ -41,6 +41,7 @@ module.exports = async (config, queue) => {
 
     // callback system to keep scope
     emitter.on('done', data => {
+      if(!data) data = {}
       const next = data.next
       if(!next || next === '') return emitter.emit('finished')
 
