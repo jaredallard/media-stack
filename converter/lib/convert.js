@@ -9,13 +9,12 @@
  const _      = require('lodash')
  const fs     = require('fs-extra')
  const path   = require('path')
- const debug  = require('debug')('media:converter:convert')
  const async  = require('async')
  const mkdirp = require('mkdirp')
 
  const conv   = require('../../helpers/handbrake-js/lib/handbrake-js.js')
 
- module.exports = (config, queue, emitter) => {
+ module.exports = (config, queue, emitter, debug) => {
    const settings = config.instance.settings
    const transcoding_path = path.join(
      __dirname,

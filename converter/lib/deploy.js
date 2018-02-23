@@ -10,12 +10,11 @@ const _       = require('lodash')
 const fs      = require('fs-extra')
 const path    = require('path')
 const async   = require('async')
-const debug   = require('debug')('media:converter:deploy')
 const Config  = require('../../helpers/config.js')
 const dyn     = require('../../helpers/dynamics.js')
 const request = require('request-promise-native')
 
-module.exports = (config, queue, emitter) => {
+module.exports = async (config, queue, emitter, debug) => {
   emitter.once('deploy', async job => {
     const mediaConfig = await Config('media') // for types
     const media_host  = dyn('media')
@@ -48,7 +47,7 @@ module.exports = (config, queue, emitter) => {
       await request({
         url: `${media_host}/v1/media/${job.id}`,
         method: 'PUT',
-        formData: {
+        form: {
           file: fs.createReadStream(file)
         }
       })

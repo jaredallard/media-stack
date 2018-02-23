@@ -42,6 +42,7 @@ module.exports = async (config, queue) => {
     // callback system to keep scope
     emitter.on('done', data => {
       if(!data) data = {}
+
       const next = data.next
       if(!next || next === '') return emitter.emit('finished')
 
@@ -90,7 +91,7 @@ module.exports = async (config, queue) => {
       debug('instance:create', stage)
 
       const modulePath = path.join(__dirname, `${stage}.js`)
-      await require(modulePath)(config, queue, emitter)
+      await require(modulePath)(config, queue, emitter, require('debug')(`media:converter:${stage}:${fileId}`))
     }, err => {
       if(err) return emitter.emit('done', {
         next: 'error',

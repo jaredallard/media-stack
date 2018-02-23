@@ -10,7 +10,6 @@ const _     = require('lodash')
 const fs    = require('fs-extra')
 const probe = require('node-ffprobe')
 const path  = require('path')
-const debug = require('debug')('media:converter:process')
 const klaw  = require('klaw')
 const async = require('async')
 
@@ -47,7 +46,7 @@ const findMediaFiles = async absPath => {
   })
 }
 
-module.exports = async (config, queue, emitter) => {
+module.exports = async (config, queue, emitter, debug) => {
   const audioCodec = config.instance.settings.audio.codec
   const videoCodec = config.instance.settings.video.codec
 
