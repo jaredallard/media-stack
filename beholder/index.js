@@ -13,6 +13,7 @@ const debug = require('debug')('media:beholder')
 const metricsDb = dyn('redis')+'/1'
 debug('metrics:address', metricsDb)
 const listener = new Redis(metricsDb)
+const redis    = new Redis(metricsDb)
 
 listener.subscribe('progress', err => {
   if(err) throw err;
@@ -28,7 +29,25 @@ const events = {
    */
   progress: async (job, data) => {
     const { percent, stage } = data
-    if(percent === 100) debug('progress', job, 'finished', stage)
+    const key                = `job:${job}:${stage}`
+
+    if(stage === 'error') return; // skip error events for now
+
+    const now = Date.now()
+    if(percent === 100) {
+      redis.hset(key, 'finished', now)
+      debug('progress', job, 'finished', stage)
+
+      const startedAt = await redis.hget(key, 'started')
+      const diff      = now - startedAt
+
+      debug('progress', job, stage, `took '${diff}ms'`)
+    } else if(percent === 0) {
+      debug('progress', job, 'started', stage)
+      redis.hset(key, 'started', now)
+    }
+
+    redis.hset(key, 'percent', percent)
   }
 }
 
