@@ -27,10 +27,9 @@ module.exports = async (config, queue, emitter, debug) => {
      * @param {String} magnet          magnet link
      * @param {String} id              File ID
      * @param {String} downloadPath    Path to save file(s) in
-     * @param {Object} job             Job Object
      * @return {Promise}               You know what to do.
      */
-    magnet: async (magnet, id, downloadPath, job) => {
+    magnet: async (magnet, id, downloadPath) => {
       debug('magnet', magnet.substr(0, 25)+'...')
       return new Promise((resolv, reject) => {
         const initStallHandler = setTimeout(() => {
@@ -52,6 +51,8 @@ module.exports = async (config, queue, emitter, debug) => {
           let lastProgress, stallHandler
           const downloadProgress = setInterval(() => {
             debug('download-progress', torrent.progress)
+
+            emitter.emit('progress', torrent.progress, 'download')
 
             if(!stallHandler) {
               lastProgress = torrent.progress
@@ -96,13 +97,12 @@ module.exports = async (config, queue, emitter, debug) => {
      * @param  {String} resourceUrl   resource url
      * @param  {String} id            File ID
      * @param  {String} downloadPath  Path to download file too
-     * @param  {Object} job           Job Object
      * @return {Promise}              .then/.catch etc
      */
     http: async (resourceUrl, id, downloadPath) => {
       debug('http', resourceUrl)
 
-      return new Promise(async (resolv, reject) => {
+      return new Promise(async (resolv) => {
         const parsed   = url.parse(resourceUrl);
         const filename = path.basename(parsed.pathname)
         const output   = path.join(downloadPath, filename)

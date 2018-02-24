@@ -15,6 +15,8 @@ const queue  = kue.createQueue({
   redis: dyn('redis')
 })
 
+debug.log = console.log.bind(console)
+
 debug('init', Date.now())
 
 const init   = async () => {
@@ -25,11 +27,21 @@ const init   = async () => {
 
 init()
 
+const cleanup = (code = 0) => {
+  debug('cleanup')
+  queue.shutdown(1000, err => {
+    debug('kue:shutdown', err)
+    process.exit(code);
+  });
+}
+
+process.on('SIGINT', () => {
+  cleanup()
+})
+
+// Handle shutdown / reject
 process.on('unhandledRejection', error => {
   debug('Uncaught Execption:', error)
 
-  queue.shutdown(1000, err => {
-    debug('kue:shutdown', err)
-    process.exit(1);
-  });
+  cleanup(1)
 });

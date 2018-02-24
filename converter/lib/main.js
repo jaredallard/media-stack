@@ -91,7 +91,10 @@ module.exports = async (config, queue) => {
       debug('instance:create', stage)
 
       const modulePath = path.join(__dirname, `${stage}.js`)
-      await require(modulePath)(config, queue, emitter, require('debug')(`media:converter:${stage}:${fileId}`))
+      const loggerInstance = require('debug')(`media:converter:${stage}:${fileId}`)
+
+      loggerInstance.log = console.log.bind(console)
+      await require(modulePath)(config, queue, emitter, loggerInstance)
     }, err => {
       if(err) return emitter.emit('done', {
         next: 'error',
@@ -103,5 +106,5 @@ module.exports = async (config, queue) => {
     })
   })
 
-  debug('queue created')
+  debug('queue listener created')
 }
