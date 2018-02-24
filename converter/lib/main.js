@@ -45,10 +45,18 @@ module.exports = async (config, queue) => {
     }
 
     // callback system to keep scope
+    let stage = 'queue' // track our stage
     emitter.on('done', data => {
       if(!data) data = {}
 
       const next = data.next
+
+      // don't emit progress on error
+      if(next !== 'error' ) emitter.emit('progress', 100)
+
+      // update our stage
+      stage      = next
+
       if(!next || next === '') return emitter.emit('finished')
 
       debug('emitter:callback:emit', next, data.data)
@@ -57,6 +65,7 @@ module.exports = async (config, queue) => {
       const staticCopy = _.create(staticData, {
         data: data.data
       })
+      emitter.emit('progress', 0)
       emitter.emit(next, staticCopy)
     })
 
@@ -76,12 +85,17 @@ module.exports = async (config, queue) => {
     })
 
     // Emit progress events on pubsub
-    emitter.on('progess', (percent, stage) => {
-      metrics.publish('progress', {
+    emitter.on('progress', (percent) => {
+      debug('metrics:progess', percent, stage)
+
+      const data = {
         job: fileId,
         percent,
         stage
-      });
+      }
+
+      const safeData = JSON.stringify(data)
+      metrics.publish('progress', safeData);
     })
 
     // error event
@@ -107,7 +121,10 @@ module.exports = async (config, queue) => {
         })
 
         // kick off the queue
-        emitter.emit(stages[0], staticData)
+        emitter.emit('done', {
+          next: stages[0],
+          data: staticData
+        })
       })
     } catch(err) {
       debug('error:main', 'caught', err)

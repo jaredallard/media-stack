@@ -77,6 +77,7 @@
        }, 20000)
 
        let progressReporter = setInterval(() => {
+         emitter.emit('progress', progress)
          debug('progress', job.id, filename, progress, eta)
        }, 10000)
 

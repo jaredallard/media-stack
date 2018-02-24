@@ -47,6 +47,17 @@ services:
       - source: config
         target: /mnt/config/config.yaml
 
+  beholder:
+    build: ./
+    environment:
+      REDIS: 'redis://redis:6379'
+    command: beholder
+    volumes:
+      - ./config:/mnt/config
+    configs:
+      - source: config
+        target: /mnt/config/config.yaml
+
   twilight:
     build: ./
     environment:
