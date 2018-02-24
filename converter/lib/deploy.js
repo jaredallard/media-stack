@@ -44,10 +44,15 @@ module.exports = async (config, queue, emitter, debug) => {
     async.eachLimit(files, 1, async file => {
       debug('upload', `${job.id} --- ${file}`)
 
+      if(!await fs.exists(file)) {
+        debug('upload:err', file, 'not found')
+        throw new Error(`${file} not found.`)
+      }
+
       await request({
         url: `${media_host}/v1/media/${job.id}`,
         method: 'PUT',
-        form: {
+        formData: {
           file: fs.createReadStream(file)
         }
       })

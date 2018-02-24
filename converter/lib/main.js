@@ -87,23 +87,31 @@ module.exports = async (config, queue) => {
     })
 
     // dynamically generate our stages
-    async.forEach(stages, async stage => {
-      debug('instance:create', stage)
+    try {
+      async.forEach(stages, async stage => {
+        debug('instance:create', stage)
 
-      const modulePath = path.join(__dirname, `${stage}.js`)
-      const loggerInstance = require('debug')(`media:converter:${stage}:${fileId}`)
+        const modulePath = path.join(__dirname, `${stage}.js`)
+        const loggerInstance = require('debug')(`media:converter:${stage}:${fileId}`)
 
-      loggerInstance.log = console.log.bind(console)
-      await require(modulePath)(config, queue, emitter, loggerInstance)
-    }, err => {
-      if(err) return emitter.emit('done', {
+        loggerInstance.log = console.log.bind(console)
+        await require(modulePath)(config, queue, emitter, loggerInstance)
+      }, err => {
+        if(err) return emitter.emit('done', {
+          next: 'error',
+          data: err
+        })
+
+        // kick off the queue
+        emitter.emit(stages[0], staticData)
+      })
+    } catch(err) {
+      debug('error:main', 'caught', err)
+      return emitter.emit('done', {
         next: 'error',
         data: err
       })
-
-      // kick off the queue
-      emitter.emit(stages[0], staticData)
-    })
+    }
   })
 
   debug('queue listener created')
