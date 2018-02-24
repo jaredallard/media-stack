@@ -57,7 +57,10 @@ module.exports = async (config, queue, emitter, debug) => {
         }
       })
     }, err => {
-      if(err) throw err;
+      if(err) return emitter.emit('done', {
+        next: 'error',
+        data: err
+      })
 
       debug('deploy', 'successfully deployed')
       emitter.emit('status', 'deployed')

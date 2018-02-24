@@ -10,6 +10,8 @@ const EventEmitter = require('events').EventEmitter
 const debug        = require('debug')('media:converter:main')
 const async        = require('async')
 const path         = require('path')
+const Redis        = require('ioredis')
+const dyn          = require('../../helpers/dynamics')
 
 // Store EventEmitters here for future cleanup
 const EmitterTable = {}
@@ -21,6 +23,9 @@ const stages = [
   'deploy'
 ]
 
+const metricsDb = dyn('redis')+'/1'
+debug('metrics:address', metricsDb)
+const metrics = new Redis(metricsDb)
 
 module.exports = async (config, queue) => {
   queue.process('newMedia', 1, async (container, done) => {
@@ -70,14 +75,13 @@ module.exports = async (config, queue) => {
       })
     })
 
+    // Emit progress events on pubsub
     emitter.on('progess', (percent, stage) => {
-      queue.create('progress', {
-        id: fileId,
+      metrics.publish('progress', {
+        job: fileId,
         percent,
         stage
-      }).save(err => {
-        if(err) return debug('progress:err', fileId, err)
-      })
+      });
     })
 
     // error event
