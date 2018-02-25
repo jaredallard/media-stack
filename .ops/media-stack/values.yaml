@@ -19,7 +19,7 @@ events:
   nodeSelector:
     triton.state: stable
   externalIps: # Hardcode the prod instance IP
-    - 159.65.73.149
+    - 159.65.77.121
 
 twilight:
   environment: production

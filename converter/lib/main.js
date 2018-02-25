@@ -33,7 +33,15 @@ module.exports = async (config, queue) => {
     const media   = data.media
     const fileId  = data.id
 
+    let type      = 'tv'
+
+    const movieLabel = _.find(data.card.labels, {
+      name: 'Movie'
+    })
+    if(movieLabel) type = 'movie'
+
     debug('media:job', fileId)
+    debug('media:type', type)
     debug('emitter:new', fileId)
     debug('media:attempts', `${container._attempts || 1}/${container._max_attempts}`)
     const emitter = EmitterTable[fileId] = new EventEmitter()
@@ -41,7 +49,8 @@ module.exports = async (config, queue) => {
     const staticData = {
       id: fileId,
       card: data.card,
-      media: media
+      media,
+      type
     }
 
     // callback system to keep scope

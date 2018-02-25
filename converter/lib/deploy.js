@@ -21,10 +21,10 @@ module.exports = async (config, queue, emitter, debug) => {
     const name        = job.card.name
     const data        = job.data
     const files       = data.files
+    const type        = job.type
 
     // TODO: add support for movie
-    const type = 'tv'
-    debug('deploy', data, media_host)
+    debug('deploy', data, type, media_host)
 
     // create the new media
     debug('deploy:create', name, type, job.id)
