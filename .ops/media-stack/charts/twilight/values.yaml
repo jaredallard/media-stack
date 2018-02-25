@@ -5,6 +5,11 @@ image:
   tag: latest
   pullPolicy: Always
 
+storage:
+  size: 800Gi
+  hostPath: "/mnt/media-v1"
+  mountPath: "/mnt/media-v1"
+
 environment: debug
 
 resources: {}

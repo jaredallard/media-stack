@@ -19,12 +19,17 @@ events:
   nodeSelector:
     triton.state: stable
   externalIps: # Hardcode the prod instance IP
-    - 159.65.77.121
+    - 159.65.75.17
+    - 159.65.72.140
 
 twilight:
   environment: production
   nodeSelector:
     triton.state: stable
+  storage:
+    size: 800Gi
+    hostPath: "/mnt/media-v1"
+    mountPath: "/mnt/media-v1"
 
 converter:
   environment: production

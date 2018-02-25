@@ -19,6 +19,13 @@ spec:
         app: {{ template "twilight.name" . }}
         release: {{ .Release.Name }}
     spec:
+      volumes:
+        - name: media
+          persistentVolume:
+
+        - name: config
+          secret:
+            secretName: media-config
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -28,6 +35,8 @@ spec:
             - name: NODE_ENV
               value: {{ .Values.environment }}
           volumeMounts:
+            - name: media
+              mountPath: {{ .Values.storage.mountPath }}
             - name: config
               mountPath: "/mnt/config"
               readOnly: true
@@ -58,8 +67,3 @@ spec:
       tolerations:
 {{ toYaml . | indent 8 }}
     {{- end }}
-
-      volumes:
-        - name: config
-          secret:
-            secretName: media-config
