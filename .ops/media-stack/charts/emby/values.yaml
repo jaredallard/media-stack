@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: emby/embyserver
+  repository: jaredallard/emby-server
   tag: latest
   pullPolicy: Always
 
@@ -26,9 +26,15 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
+storage:
+  size: 800Gi
+  mountPath: /nfs
+  hostPath: /
+
 resources: {}
 
-nodeSelector: {}
+nodeSelector:
+  triton.state: stable
 
 tolerations: []
 
