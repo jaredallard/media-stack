@@ -21,8 +21,9 @@ spec:
     spec:
       volumes:
         - name: media
-          persistentVolume:
-
+          hostPath:
+            path: "{{ .Values.storage.hostPath }}"
+            type: Directory
         - name: config
           secret:
             secretName: media-config
@@ -36,7 +37,7 @@ spec:
               value: {{ .Values.environment }}
           volumeMounts:
             - name: media
-              mountPath: {{ .Values.storage.mountPath }}
+              mountPath: "{{ .Values.storage.mountPath }}"
             - name: config
               mountPath: "/mnt/config"
               readOnly: true
