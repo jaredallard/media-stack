@@ -13,18 +13,6 @@ service:
   type: ClusterIP
   port: 80
 
-ingress:
-  enabled: true
-  annotations:
-    io.rancher.scheduler.affinity.host_label: "triton.role=storage"
-  path: /
-  hosts:
-    - media.tritonjs.com
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
-
 storage:
   size: 800Gi
   mountPath: /nfs

@@ -11,9 +11,13 @@ spec:
   type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.port }}
-      targetPort: http
+      targetPort: 8096
       protocol: TCP
       name: http
   selector:
     app: {{ template "emby.name" . }}
     release: {{ .Release.Name }}
+{{- with .Values.externalIps }}
+  externalIps:
+{{ toYaml . | indent 4 }}
+{{- end }}

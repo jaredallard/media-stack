@@ -7,7 +7,7 @@ CONFIG_DIR="/nfs/emby"
 MEDIA_DIR="/nfs/production"
 
 CONFIG="/config"
-PRODUCTION="/production"
+PRODUCTION="/mnt/media-v1/production"
 
 echo "info: wrapping emby to use our bind mounts around the nfs"
 
