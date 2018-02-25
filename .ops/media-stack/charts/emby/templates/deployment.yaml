@@ -1,58 +1,40 @@
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: {{ template "twilight.fullname" . }}
+  name: {{ template "emby.fullname" . }}
   labels:
-    app: {{ template "twilight.name" . }}
-    chart: {{ template "twilight.chart" . }}
+    app: {{ template "emby.name" . }}
+    chart: {{ template "emby.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ template "twilight.name" . }}
+      app: {{ template "emby.name" . }}
       release: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: {{ template "twilight.name" . }}
+        app: {{ template "emby.name" . }}
         release: {{ .Release.Name }}
     spec:
-      volumes:
-        - name: media
-          persistentVolumeClaim:
-            claimName: media
-        - name: config
-          secret:
-            secretName: media-config
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: [ "/usr/bin/docker-entrypoint", "twilight" ]
-          env:
-            - name: NODE_ENV
-              value: {{ .Values.environment }}
-          volumeMounts:
-            - name: media
-              mountPath: "{{ .Values.storage.mountPath }}"
-            - name: config
-              mountPath: "/mnt/config"
-              readOnly: true
           ports:
             - name: http
-              containerPort: 8001
+              containerPort: 80
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /health
-              port: 8001
-            initialDelaySeconds: 60 # don't recreate until after 60s+
+              path: /
+              port: http
           readinessProbe:
             httpGet:
-              path: /health
-              port: 8001
+              path: /
+              port: http
           resources:
 {{ toYaml .Values.resources | indent 12 }}
     {{- with .Values.nodeSelector }}

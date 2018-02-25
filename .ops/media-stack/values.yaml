@@ -27,7 +27,6 @@ twilight:
   environment: production
   nodeSelector:
     triton.state: stable
-    triton.role:  storage
   storage:
     hostPath: "/mnt/media-v1"
     mountPath: "/mnt/media-v1"
