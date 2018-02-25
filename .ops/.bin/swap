@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+#
+# Swap a running service for a local chart. Cuts deploy times.
+
+NAME="$1"
+
+if [[ -z "$NAME" ]]; then
+  echo "E: Missing required param: \$1 service name"
+  exit 1
+fi
+
+echo " --> removing deployment: $NAME"
+kubectl delete deployment "media-$NAME"
+kubectl delete svc "media-$NAME" 2>/dev/null
+kubectl delete svc "$NAME"
+
+echo " --> purging exisiting helm deploy: [media-]$NAME"
+helm delete --purge "$NAME" 2>/dev/null
+helm delete --purge "media-$NAME"
+
+pushd "media-stack/charts" > /dev/null
+
+if [[ ! -d "$NAME" ]]; then
+  echo "E: service not found"
+fi
+
+echo " --> creating deploment: $NAME"
+helm install -f ../values.yaml --debug --name "media-$NAME" "$NAME"
+popd > /dev/null
+
+echo "done"

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+POD=$(kubectl get pod -l "app=$1" | sed -n '2 p' | awk '{ print $1 }')
+echo "${POD}"

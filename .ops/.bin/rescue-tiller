@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+#
+# For some fucking reason Tiller likes to die and be a PITA, this kills it and it "just works" again.
+
+TILLER=$(kubectl get pods --all-namespaces | grep 'tiller' | awk '{ print $2 }')
+
+echo "--> killing tiller pod: ${TILLER}"
+kubectl delete --namespace kube-system "po/${TILLER}"
