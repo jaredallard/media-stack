@@ -1,10 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "emby.fullname" . }}
+  name: emby
   labels:
-    app: {{ template "emby.name" . }}
-    chart: {{ template "emby.chart" . }}
+    app: emby
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
@@ -15,7 +14,7 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app: {{ template "emby.name" . }}
+    app: media
     release: {{ .Release.Name }}
 {{- with .Values.externalIps }}
   externalIps:

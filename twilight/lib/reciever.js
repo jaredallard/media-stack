@@ -59,7 +59,14 @@ module.exports = async (config, queue) => {
     if(type.indexOf('..') !== -1) throw new Error('Directory traversel attempt.')
     if(name.indexOf('..') !== -1) throw new Error('Directory traversel attempt.')
 
-    return path.join(basePath, type, name)
+    let typePath = type
+    const configTypePath = config.instance.types[type]
+    if(configTypePath) {
+      typePath = configTypePath
+      debug('config:type:path', type, '->', typePath)
+    }
+
+    return path.join(basePath, typePath, name)
   }
 
   const exists = async (name, type) => {
@@ -96,6 +103,8 @@ module.exports = async (config, queue) => {
 
     debug('new', type, name, id)
 
+    debug('new:store', storeAt)
+
     mediaIds[id] = {
       name: name,
       type: type,
@@ -131,6 +140,10 @@ module.exports = async (config, queue) => {
     })
 
     const file = req.files[0]
+    if(!file) return res.status(400).send({
+      success: false,
+      message: 'Missing file.'
+    })
 
     if(req.files.length !== 1) {
       await fs.unlink(file.path)

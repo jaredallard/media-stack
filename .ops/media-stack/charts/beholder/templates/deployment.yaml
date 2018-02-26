@@ -1,43 +1,39 @@
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: {{ template "emby.fullname" . }}
+  name: {{ template "beholder.fullname" . }}
   labels:
-    app: {{ template "emby.name" . }}
-    chart: {{ template "emby.chart" . }}
+    app: {{ template "beholder.name" . }}
+    chart: {{ template "beholder.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ template "emby.name" . }}
+      app: {{ template "beholder.name" . }}
       release: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: {{ template "emby.name" . }}
+        app: {{ template "beholder.name" . }}
         release: {{ .Release.Name }}
     spec:
       volumes:
-        - name: media
-          persistentVolumeClaim:
-            claimName: emby-media-pvc
+        - name: config
+          secret:
+            secretName: media-config
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          securityContext:
-           capabilities:
-             add:
-               - SYS_ADMIN
+          command: [ "/usr/bin/docker-entrypoint", "beholder" ]
+          env:
+            - name: NODE_ENV
+              value: {{ .Values.environment }}
           volumeMounts:
-            - name: media
-              mountPath: "{{ .Values.storage.mountPath }}"
-          ports:
-            - name: http
-              containerPort: 8096
-              protocol: TCP
+            - name: config
+              mountPath: "/mnt/config"
           resources:
 {{ toYaml .Values.resources | indent 12 }}
     {{- with .Values.nodeSelector }}

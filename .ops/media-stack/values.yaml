@@ -23,18 +23,21 @@ events:
     - 159.65.75.17
     - 159.65.72.140
 
-emby:
+beholder:
+  environment: production
+
+media:
+  twilight:
+    environment: production
+
   nodeSelector:
     triton.state: stable
     triton.role: storage # for when hostPath works
   externalIps: # Hardcode the prod instance IP
     - 159.65.75.17
 
-twilight:
-  environment: production
-  nodeSelector:
-    triton.state: stable
   storage:
+    size: 800Gi
     hostPath: "/mnt/media-v1"
     mountPath: "/mnt/media-v1"
 

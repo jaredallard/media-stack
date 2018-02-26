@@ -3,11 +3,18 @@
 set -e
 
 INIT="/init"
-CONFIG_DIR="/nfs/emby"
-MEDIA_DIR="/nfs/production"
+CONFIG_DIR="/mnt/media-v1/emby"
+MEDIA_DIR="/mnt/media-v1/production"
 
 CONFIG="/config"
 PRODUCTION="/mnt/media-v1/production"
+
+export GID=999
+export UID=999
+export GIDLIST=999
+
+addgroup -g 999 emby
+adduser -u 999 -G emby -s /bin/sh -D emby
 
 echo "info: wrapping emby to use our bind mounts around the nfs"
 

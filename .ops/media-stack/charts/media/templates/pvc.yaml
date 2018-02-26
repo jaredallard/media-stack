@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: emby-media-pvc
+  name: media-pvc
 spec:
   accessModes:
     - ReadWriteMany

@@ -1,39 +1,39 @@
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: {{ template "twilight.fullname" . }}
+  name: media-media
   labels:
-    app: {{ template "twilight.name" . }}
-    chart: {{ template "twilight.chart" . }}
+    app: media
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ template "twilight.name" . }}
+      app:  media
       release: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: {{ template "twilight.name" . }}
+        app: media
         release: {{ .Release.Name }}
     spec:
       volumes:
         - name: media
           persistentVolumeClaim:
-            claimName: media
+            claimName: media-pvc
         - name: config
           secret:
             secretName: media-config
+
       containers:
-        - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        - name: twilight
+          image: "jaredallard/media-stack"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: [ "/usr/bin/docker-entrypoint", "twilight" ]
           env:
             - name: NODE_ENV
-              value: {{ .Values.environment }}
+              value: {{ .Values.twilight.environment }}
           volumeMounts:
             - name: media
               mountPath: "{{ .Values.storage.mountPath }}"
@@ -53,6 +53,24 @@ spec:
             httpGet:
               path: /health
               port: 8001
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+
+        # Emby
+        - name: emby
+          image: "jaredallard/emby-server"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+           capabilities:
+             add:
+               - SYS_ADMIN
+          volumeMounts:
+            - name: media
+              mountPath: "{{ .Values.storage.mountPath }}"
+          ports:
+            - name: http
+              containerPort: 8096
+              protocol: TCP
           resources:
 {{ toYaml .Values.resources | indent 12 }}
     {{- with .Values.nodeSelector }}
