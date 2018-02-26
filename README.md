@@ -18,7 +18,6 @@ A pipeline to allow media processing.
 
  * Pull the repo down on a server `git clone <url> --recursive`
  * Edit `config/config.yaml` to reflect various keys / server locations.
- * Upload generated deploy pubkey `./deploy/ssh/key.pub` onto your media server.
 
 
 ```bash
