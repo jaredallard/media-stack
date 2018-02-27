@@ -36,7 +36,7 @@ module.exports = (emitter, queue, config) => {
     const readyBoard    = config.instance.flow_ids.ready
 
     if(listBefore !== requestsBoard) return debug('newMedia', 'origin not requests')
-    if(listNow !== readyBoard)       return debug('newMedia', 'dest not ready')
+    if(listNow    !== readyBoard)    return debug('newMedia', 'dest not ready')
 
     debug('newMedia', 'adding new media', `${cardId}/${cardName}`)
     const card        = await trello.makeRequest('get', `/1/cards/${cardId}`)
