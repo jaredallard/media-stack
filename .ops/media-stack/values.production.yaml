@@ -8,11 +8,14 @@ redis:
   persistence: # don't persist jobs
     enabled: false
 
+
 # Service configuration
 deploy:
   environment: production
   nodeSelector:
     triton.state: stable
+  image:
+    tag: stable
 
 events:
   replicaCount: 2
@@ -22,9 +25,14 @@ events:
   externalIps: # Hardcode the prod instance IP
     - 159.65.75.17
     - 159.65.72.140
+  image:
+    tag: stable
+
 
 beholder:
   environment: production
+  image:
+    tag: stable
 
 media:
   twilight:
@@ -35,6 +43,9 @@ media:
     triton.role: storage # for when hostPath works
   externalIps: # Hardcode the prod instance IP
     - 159.65.75.17
+  image:
+    tag: stable
+
 
   storage:
     size: 800Gi
@@ -45,3 +56,5 @@ converter:
   environment: production
   nodeSelector:
     triton.role: bigdata
+  image:
+    tag: stable

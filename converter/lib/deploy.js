@@ -6,24 +6,20 @@
  * @version 1
  */
 
-const _       = require('lodash')
-const fs      = require('fs-extra')
-const path    = require('path')
-const async   = require('async')
-const Config  = require('../../helpers/config.js')
-const dyn     = require('../../helpers/dynamics.js')
-const request = require('request-promise-native')
+const fs       = require('fs-extra')
+const async    = require('async')
+const dyn      = require('../../helpers/dynamics.js')
+const request  = require('request-promise-native')
+const Throttle = require('throttle')
 
 module.exports = async (config, queue, emitter, debug) => {
   emitter.once('deploy', async job => {
-    const mediaConfig = await Config('media') // for types
     const media_host  = dyn('media')
     const name        = job.card.name
     const data        = job.data
     const files       = data.files
     const type        = job.type
 
-    // TODO: add support for movie
     debug('deploy', data, type, media_host)
 
     // create the new media
@@ -49,11 +45,20 @@ module.exports = async (config, queue, emitter, debug) => {
         throw new Error(`${file} not found.`)
       }
 
+      const fileStream = fs.createReadStream(file)
+      if(config.instance.throttled) {
+        const throttleSpeed = config.instance.throttle_upload
+        debug('config:throttle', throttleSpeed)
+        fileStream.pipe(new Throttle({
+          bps: throttleSpeed
+        }))
+      }
+
       await request({
         url: `${media_host}/v1/media/${job.id}`,
         method: 'PUT',
         formData: {
-          file: fs.createReadStream(file)
+          file: fileStream
         }
       })
     }, err => {

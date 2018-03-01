@@ -1,3 +1,0 @@
-[submodule "helpers/handbrake-js"]
-	path = helpers/handbrake-js
-	url = git@github.com:jaredallard/handbrake-js

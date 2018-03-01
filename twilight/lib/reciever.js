@@ -172,7 +172,7 @@ module.exports = async (config, queue) => {
       await fs.move(file.path, output)
     } catch(e) {
       await fs.unlink(file.path)
-
+      debug('link:err', e)
       return res.status(500).send({
         success: false,
         message: 'Failed to link media.'

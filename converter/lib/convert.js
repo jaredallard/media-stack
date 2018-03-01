@@ -12,7 +12,7 @@
  const async  = require('async')
  const mkdirp = require('mkdirp')
 
- const conv   = require('../../helpers/handbrake-js/lib/handbrake-js.js')
+ const conv   = require('handbrake-js')
 
  module.exports = (config, queue, emitter, debug) => {
    const settings = config.instance.settings
