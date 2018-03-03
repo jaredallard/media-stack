@@ -33,6 +33,8 @@ spec:
               readOnly: true
             - name: downloading
               mountPath: "/mnt/downloading"
+            - name: transcoding
+              mountPath: "/mnt/transcoding"
           resources:
 {{ toYaml .Values.resources | indent 12 }}
     {{- with .Values.nodeSelector }}
@@ -53,4 +55,6 @@ spec:
           secret:
             secretName: media-config
         - name: downloading
+          emptyDir: {}
+        - name: transcoding
           emptyDir: {}
