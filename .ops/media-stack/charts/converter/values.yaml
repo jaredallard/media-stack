@@ -7,8 +7,8 @@ image:
 
 resources:
   requests:
-    cpu: 500m
-    memory: 500Mi
+    cpu: 300m
+    memory: 1Gi
 
 environment: debug
 

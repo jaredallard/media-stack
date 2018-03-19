@@ -16,9 +16,14 @@
 
  module.exports = (config, queue, emitter, debug) => {
    const settings = config.instance.settings
+
+   let pathPrefix = ''
+   if(!path.isAbsolute(config.instance.transcoding_path)) {
+     debug('path:not-absolute')
+     pathPrefix = path.join(__dirname, '..')
+   }
    const transcoding_path = path.join(
-     __dirname,
-     '..',
+     pathPrefix,
      config.instance.transcoding_path
    )
 
@@ -37,8 +42,28 @@
 
    emitter.once('convert', async job => {
      emitter.emit('status', 'processing')
+     const dirtyBit = path.join(transcoding_path, job.id, 'dirty')
+     const baseDir  = path.join(transcoding_path, job.id)
 
-     const files = job.data.media
+     await mkdirp(baseDir)
+
+     let files = job.data.media
+     if(await fs.exists(dirtyBit)) {
+       const isDirty = await fs.readFile(dirtyBit, 'utf8')
+       if(isDirty === 'false') {
+         debug('convert:dirtyBit', false)
+
+         emitter.emit('status', 'complete')
+         return emitter.emit('done', {
+           next: 'deploy',
+           data: {
+            files: files
+           }
+         })
+       }
+     } else {
+       await fs.writeFile(dirtyBit, 'true', 'utf8')
+     }
 
      // only ever convert max one media at a time.
      const newFiles = []
@@ -49,7 +74,7 @@
        debug('file', file)
 
        const filename = path.basename(file.path.replace(/\.\w+$/, '.mkv'))
-       const output = path.join(transcoding_path, job.id, filename)
+       const output = path.join(baseDir, filename)
 
        debug('convert', filename, '->', output)
        newFiles.push(output)
@@ -127,10 +152,13 @@
           debug('end', 'fired')
           clearInterval(progressReporter)
         })
-     }, err => {
+     }, async err => {
        if(err) throw err;
 
        debug('media:files', files.length)
+
+       debug('converter:dirtyBit', 'marking false')
+       await fs.writeFile(dirtyBit, 'false', 'utf8')
 
        emitter.emit('status', 'complete')
        emitter.emit('done', {

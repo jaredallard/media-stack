@@ -23,7 +23,12 @@ RUN echo '@edge http://dl-cdn.alpinelinux.org/alpine/edge/main' >> /etc/apk/repo
  &&   apk upgrade --no-cache --no-self-upgrade --available
 
 # Install our deps
-RUN apk add --no-cache ffmpeg@edge handbrake@edge dumb-init redis bash git
+RUN apk add --no-cache ffmpeg@edge handbrake@edge dumb-init redis bash git jq
+
+
+# Build Trickle from source (converter)
+COPY docker/build-trickle.sh /
+RUN bash /build-trickle.sh
 
 # Copy over the entry-point
 COPY docker/docker-entrypoint /usr/bin/docker-entrypoint

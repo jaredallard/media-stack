@@ -1,0 +1,10 @@
+rbac:
+  create: true
+
+defaultBackend:
+  nodeSelector:
+    triton.role: storage
+
+controller:
+  nodeSelector:
+    triton.role: storage

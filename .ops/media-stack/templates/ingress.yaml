@@ -1,0 +1,42 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+
+{{- $endpoints := .Values.global.endpoints }}
+metadata:
+  name: services
+  annotations:
+    kubernetes.io/tls-acme: "true"
+    certmanager.k8s.io/cluster-issuer: "letsencrypt-prod"
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+    - host: {{ $endpoints.events }}
+      http:
+        paths:
+        - backend:
+            serviceName: events
+            servicePort: 80
+          path: /
+
+    - host: {{ $endpoints.deploy }}
+      http:
+        paths:
+        - backend:
+            serviceName: deploy
+            servicePort: 80
+          path: /
+
+    - host: {{ $endpoints.media }}
+      http:
+        paths:
+        - backend:
+            serviceName: media
+            servicePort: 80
+          path: /
+
+  tls:
+    - hosts:
+      - {{ $endpoints.events }}
+      - {{ $endpoints.deploy }}
+      - {{ $endpoints.media }}
+      secretName: app-tritonjs-com-tls

@@ -16,7 +16,3 @@ spec:
   selector:
     app: media
     release: {{ .Release.Name }}
-{{- with .Values.externalIps }}
-  externalIps:
-{{ toYaml . | indent 4 }}
-{{- end }}

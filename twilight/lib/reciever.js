@@ -16,6 +16,16 @@ const multer  = require('multer')
 
 let app = express()
 
+app.use(function(req, res, next) {
+    var data = '';
+    req.on('data', function(chunk) {
+        data += chunk;
+    });
+    req.on('end', function() {
+        req.rawBody = data;
+        next();
+    });
+})
 app.use(bp.json())
 
 // Not sure if we want to persist ids since we're sorta a
@@ -134,6 +144,7 @@ module.exports = async (config, queue) => {
 
     debug('media:add', id, pointer)
     debug('media:files', req.files)
+    debug('media:raw', req.rawBody)
     if(!req.files) return res.status(400).send({
       success: false,
       message: 'No file provided.'
@@ -169,6 +180,11 @@ module.exports = async (config, queue) => {
     debug('media:move', file.filename, '->', output)
 
     try {
+      if(await fs.exists(output)) {
+        debug('link:warn', `removed existing ${output}`)
+        await fs.unlink(output)
+      }
+
       await fs.move(file.path, output)
     } catch(e) {
       await fs.unlink(file.path)

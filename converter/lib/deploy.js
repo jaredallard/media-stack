@@ -6,11 +6,12 @@
  * @version 1
  */
 
-const fs       = require('fs-extra')
-const async    = require('async')
-const dyn      = require('../../helpers/dynamics.js')
-const request  = require('request-promise-native')
-const Throttle = require('throttle')
+const fs          = require('fs-extra')
+const async       = require('async')
+const dyn         = require('../../helpers/dynamics.js')
+const request     = require('request')
+const path        = require('path')
+const FormData    = require('form-data')
 
 module.exports = async (config, queue, emitter, debug) => {
   emitter.once('deploy', async job => {
@@ -46,20 +47,37 @@ module.exports = async (config, queue, emitter, debug) => {
       }
 
       const fileStream = fs.createReadStream(file)
-      if(config.instance.throttled) {
-        const throttleSpeed = config.instance.throttle_upload
-        debug('config:throttle', throttleSpeed)
-        fileStream.pipe(new Throttle({
-          bps: throttleSpeed
-        }))
-      }
-
-      await request({
-        url: `${media_host}/v1/media/${job.id}`,
-        method: 'PUT',
-        formData: {
-          file: fileStream
+      return new Promise((resolv, reject) => {
+        let throttleSpeed = 120 * 125000 // 15 MB/s
+        if(config.instance.throttled) {
+          throttleSpeed = config.instance.throttle_upload
+          debug('config:throttle', throttleSpeed)
         }
+
+        const form   = new FormData()
+        const fstat  = fs.statSync(file)
+        const opts   = {
+          filename: path.basename(file),
+          contentType: 'video/x-matroska',
+          knownLength: fstat.size
+        }
+        form.append('file', fileStream, opts)
+
+        debug('file:form', opts)
+        const req = request({
+          url: `${media_host}/v1/media/${job.id}`,
+          method: 'PUT'
+        })
+
+        // Pipe into the throttler and then pipe into Request
+        form.pipe(req)
+
+        req.on('error', reject)
+        req.on('response', res => {
+          debug('twilight', res.statusCode, res.body)
+          if(res.statusCode !== 200) return reject(res.body)
+          return resolv()
+        })
       })
     }, err => {
       if(err) return emitter.emit('done', {

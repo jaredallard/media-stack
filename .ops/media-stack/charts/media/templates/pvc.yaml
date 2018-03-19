@@ -4,8 +4,8 @@ metadata:
   name: media-pvc
 spec:
   accessModes:
-    - ReadWriteMany
-  storageClassName: ""
+    - ReadWriteOnce
+  storageClassName: standard
   resources:
     requests:
-      storage: {{ .Values.storage.size }}
+      storage: 600Gi

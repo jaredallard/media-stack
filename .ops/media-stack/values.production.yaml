@@ -1,4 +1,9 @@
 # Production Config
+global:
+  endpoints:
+    events: app.tritonjs.com
+    media:  media.tritonjs.com
+    deploy: deploy.tritonjs.com
 
 # Redis configuration
 redis:

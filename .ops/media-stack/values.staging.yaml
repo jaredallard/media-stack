@@ -1,39 +1,42 @@
-# Production Config
+# Staging Config
+global:
+  endpoints:
+    events: app.staging.tritonjs.com
+    media:  media.staging.tritonjs.com
+    deploy: deploy.staging.tritonjs.com
 
 # Redis configuration
 redis:
-  nodeSelector:
-    triton.state: stable
   usePassword: false
   persistence: # don't persist jobs
     enabled: false
 
 # Service configuration
 deploy:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 300Mi
   environment: debug
-  nodeSelector:
-    triton.state: stable
 
 events:
   replicaCount: 1
   environment: debug
-  nodeSelector:
-    triton.state: stable
-  externalIps:
-    - 138.68.241.148
 
 beholder:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 300Mi
   environment: debug
 
 media:
   twilight:
     environment: debug
-
-  nodeSelector:
-    triton.state: stable
-    triton.role: storage # for when hostPath works
-  externalIps:
-    - 138.68.241.148
+    resources:
+      requests:
+        cpu: 100m
+        memory: 300Mi
 
   storage:
     size: 800Gi
@@ -42,5 +45,3 @@ media:
 
 converter:
   environment: debug
-  nodeSelector:
-    triton.role: bigdata
