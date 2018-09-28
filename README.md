@@ -1,3 +1,8 @@
+# NOTICE: This project is not dead, it was moved
+
+**See [tritonmedia](https://github.com/tritonmedia)**. It was moved to get out of a mono-repo and be better organized.
+
+
 # Media Stack
 
 A pipeline to allow media processing.
